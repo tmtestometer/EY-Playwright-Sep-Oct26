@@ -1,0 +1,17 @@
+{
+  "name": "ey-sep29-batch",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {},
+  "dependencies": {
+    "playwright": "^1.63.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^26.6.3"
+  }
+}

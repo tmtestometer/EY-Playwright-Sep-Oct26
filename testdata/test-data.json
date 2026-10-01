@@ -1,0 +1,194 @@
+[
+    {
+        "testname": "verify error message for empty credentials",
+        "username": "",
+        "password": "",
+        "errorMsg": "Epic sadface: Username is required"
+    },
+    {
+        "testname": "verify error message for empty username",
+        "username": "",
+        "password": "abcd",
+        "errorMsg": "Epic sadface: Username is required"
+    },
+    {
+        "testname": "verify error message for empty password",
+        "username": "abd",
+        "password": "",
+        "errorMsg": "Epic sadface: Password is required"
+    },
+    {
+        "testname": "verify error message for invalid username",
+        "username": "invalidUser",
+        "password": "secret",
+        "errorMsg": "Epic sadface: Username and password do not match any user in this service"
+    },
+    {
+        "testname": "verify error message for invalid password",
+        "username": "standard_user",
+        "password": "invalidPassword",
+        "errorMsg": "Epic sadface: Username and password do not match any user in this service"
+    },
+    {
+        "testname": "verify error message for invalid username and invalid password",
+        "username": "invalidUser",
+        "password": "invalidPassword",
+        "errorMsg": "Epic sadface: Username and password do not match any user in this service"
+    },
+    {
+        "testname": "verify error message for username containing spaces",
+        "username": " invalidUser ",
+        "password": "abcd",
+        "errorMsg": "Epic sadface: Username and password do not match any user in this service"
+    },
+    {
+        "testname": "verify error message for password containing spaces",
+        "username": "standard_user",
+        "password": " abcd ",
+        "errorMsg": "Epic sadface: Username and password do not match any user in this service"
+    },
+    {
+        "testname": "verify error message for username with only spaces",
+        "username": "   ",
+        "password": "abcd",
+        "errorMsg": "Epic sadface: Username and password do not match any user in this service"
+    },
+    {
+        "testname": "verify error message for password with only spaces",
+        "username": "standard_user",
+        "password": "   ",
+        "errorMsg": "Epic sadface: Username and password do not match any user in this service"
+    },
+    {
+        "testname": "verify error message for username with special characters",
+        "username": "@#$%^&*",
+        "password": "abcd",
+        "errorMsg": "Epic sadface: Username and password do not match any user in this service"
+    },
+    {
+        "testname": "verify error message for password with special characters",
+        "username": "standard_user",
+        "password": "@#$%^&*",
+        "errorMsg": "Epic sadface: Username and password do not match any user in this service"
+    },
+    {
+        "testname": "verify error message for username with numeric value",
+        "username": "123456789",
+        "password": "abcd",
+        "errorMsg": "Epic sadface: Username and password do not match any user in this service"
+    },
+    {
+        "testname": "verify error message for password with numeric value",
+        "username": "standard_user",
+        "password": "123456789",
+        "errorMsg": "Epic sadface: Username and password do not match any user in this service"
+    },
+    {
+        "testname": "verify error message for username with special and numeric characters",
+        "username": "user@123#$",
+        "password": "abcd",
+        "errorMsg": "Epic sadface: Username and password do not match any user in this service"
+    },
+    {
+        "testname": "verify error message for password with special and numeric characters",
+        "username": "standard_user",
+        "password": "Pass@123#",
+        "errorMsg": "Epic sadface: Username and password do not match any user in this service"
+    },
+    {
+        "testname": "verify error message for username with uppercase characters",
+        "username": "STANDARD_USER",
+        "password": "abcd",
+        "errorMsg": "Epic sadface: Username and password do not match any user in this service"
+    },
+    {
+        "testname": "verify error message for password with uppercase characters",
+        "username": "standard_user",
+        "password": "ABCD",
+        "errorMsg": "Epic sadface: Username and password do not match any user in this service"
+    },
+    {
+        "testname": "verify error message for username with lowercase characters",
+        "username": "standarduser",
+        "password": "abcd",
+        "errorMsg": "Epic sadface: Username and password do not match any user in this service"
+    },
+    {
+        "testname": "verify error message for password with lowercase characters",
+        "username": "standard_user",
+        "password": "abcd",
+        "errorMsg": "Epic sadface: Username and password do not match any user in this service"
+    },
+    {
+        "testname": "verify error message for username with leading spaces",
+        "username": " standard_user",
+        "password": "abcd",
+        "errorMsg": "Epic sadface: Username and password do not match any user in this service"
+    },
+    {
+        "testname": "verify error message for username with trailing spaces",
+        "username": "standard_user ",
+        "password": "abcd",
+        "errorMsg": "Epic sadface: Username and password do not match any user in this service"
+    },
+    {
+        "testname": "verify error message for password with leading spaces",
+        "username": "standard_user",
+        "password": " abcd",
+        "errorMsg": "Epic sadface: Username and password do not match any user in this service"
+    },
+    {
+        "testname": "verify error message for password with trailing spaces",
+        "username": "standard_user",
+        "password": "abcd ",
+        "errorMsg": "Epic sadface: Username and password do not match any user in this service"
+    },
+    {
+        "testname": "verify error message for username with special unicode characters",
+        "username": "üserñame",
+        "password": "abcd",
+        "errorMsg": "Epic sadface: Username and password do not match any user in this service"
+    },
+    {
+        "testname": "verify error message for password with unicode characters",
+        "username": "standard_user",
+        "password": "pässword",
+        "errorMsg": "Epic sadface: Username and password do not match any user in this service"
+    },
+    {
+        "testname": "verify error message for very long username",
+        "username": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "password": "abcd",
+        "errorMsg": "Epic sadface: Username and password do not match any user in this service"
+    },
+    {
+        "testname": "verify error message for very long password",
+        "username": "standard_user",
+        "password": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "errorMsg": "Epic sadface: Username and password do not match any user in this service"
+    },
+    {
+        "testname": "verify error message for username containing newline",
+        "username": "invalidUser\n",
+        "password": "abcd",
+        "errorMsg": "Epic sadface: Username and password do not match any user in this service"
+    },
+    {
+        "testname": "verify error message for password containing newline",
+        "username": "standard_user",
+        "password": "abcd\n",
+        "errorMsg": "Epic sadface: Username and password do not match any user in this service"
+    },
+    {
+        "testname": "verify error message for username containing tab",
+        "username": "invalid\tUser",
+        "password": "abcd",
+        "errorMsg": "Epic sadface: Username and password do not match any user in this service"
+    },
+    {
+        "testname": "verify error message for password containing tab",
+        "username": "standard_user",
+        "password": "abc\tdef",
+        "errorMsg": "Epic sadface: Username and password do not match any user in this service"
+    }
+]

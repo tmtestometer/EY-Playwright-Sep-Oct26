@@ -1,0 +1,104 @@
+Planner
+Generator
+Healer
+
+
+Playwright project
+folder (directory)
+
+npm - node package manager
+npx = node package executor
+
+1 - folder -> node project
+npm init
+output - package.json file
+
+
+2 - install playwright libbary
+
+npm install playwright
+
+outcome - node_modules
+dependencies 
+
+
+3 - npm init playwright
+
+codegen - code generator
+
+
+1 - spec.js
+
+testdir - test repository
+projects - all browsers
+screeshot - 'on'
+video - 'on'
+
+
+execute your first test case
+
+  headless - no ui visible
+npx playwright test
+npx playwright show-report
+
+
+headed node
+npx playwright test --headed
+
+
+command to create framework
+
+npm init
+npm install playwright 
+npm init playwright
+
+
+npx playwright test
+npx playwright test --headed
+npx playwright codegen
+npx playwright show-report
+npx playwright test --grep "@tc-145"
+npx playwright test --workers=1
+npx playwright test --project=chromium
+npx playwright test --project=chromium --project=firefox
+
+npx playwright test login.spec.js --grep "@sanity|@regression"
+npx playwright test login.spec.js --grep "(?=.*@sanity)(?=.*@regression)"
+npx playwright test login.spec.js --grep "@tc" --headed
+
+npx playwright test --ui
+npx playwright test --debug
+npx playwright test --last-failed
+
+
+await expect("10").toBe("20");
+
+
+merv
+Running 9 tests using 4 workers
+
+first 4 test case - 4 
+
+105 testcase - 10 sec 
+
+4 workers
+
+260 sec 
+
+total time of suite execution - \
+
+
+
+tag name = h3
+attribute = data-test = error @
+text
+
+
+<h3 data-test="error"><button class="error-button" data-test="error-button"></button>Epic sadface: Username is required</h3>
+
+
+
+<input class="input_error form_input error" placeholder="Username" type="text" data-test="username" id="user-name" name="user-name" autocorrect="off" autocapitalize="none" value="">
+
+
+starts-with (where, what)

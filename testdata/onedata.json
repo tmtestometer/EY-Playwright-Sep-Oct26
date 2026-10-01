@@ -1,0 +1,6 @@
+{
+        "testname": "verify error message for empty credentials",
+        "username": "",
+        "password": "",
+        "errorMsg": "Epic sadface: Username is required"
+    }
