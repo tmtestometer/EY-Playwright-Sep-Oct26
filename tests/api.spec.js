@@ -26,7 +26,8 @@ test.describe(() => {
                 let url = "https://api.restful-api.dev/objects";
                 let response = await request.post(url, {
                     headers : {
-                        "content-type":"application/json"
+                        "content-type":"application/json",
+                        "X-version": "v2"
                     },
                     data: {
                     "name": "Vaibhav Phone",
@@ -46,7 +47,7 @@ test.describe(() => {
             console.log(assetID);    
 
         });
-
+// update 
         test("put api",  async ({ request }) => {
                 let url = "https://api.restful-api.dev/objects/"+assetID;
                 let response = await request.put(url, {
