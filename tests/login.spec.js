@@ -1,19 +1,19 @@
 import { test, expect } from '@playwright/test';
 import data from '../testdata/onedata.json' with {"type":"json"}
 import { textbox_username, textbox_password } from '../locator/loginLocator.js';
-
+import { LoginPage } from '../pages/loginpage.js';
 
 
 //for(let data of testdata){
   test(`${data.testname}`,  async ({ page }) => {
+
+    loginPageObject = new LoginPage(page);
     await page.goto('https://www.saucedemo.com/'); // 200 ms
-    await page.locator(textbox_username).click(); // 50 ms
-    await page.locator(textbox_username).fill(data.username); // 300ms
-    await page.locator(textbox_password).click(); // 200 ms
-    await page.locator(textbox_password).fill(data.password); // 50 ms
-    await page.locator("[data-test=\"login-button\"]").click();
-    let actualErrorMsg = await page.locator('[data-test="error"]').textContent();
-    expect.soft(actualErrorMsg).toBe(data.errorMsg)
+    await loginPageObject.performLogin(data.username, data.password);
+    let actualErrorMsg = await loginPageObject.getErrorMsg();
+    expect.soft(actualErrorMsg).toBe(data.errorMsg);
+
+
   });
 //}
 
