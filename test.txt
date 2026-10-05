@@ -102,3 +102,32 @@ text
 
 
 starts-with (where, what)
+
+
+
+backward-compatibility 
+
+https://ey.com/api/v1/user/create  - 1000 companies
+https://ey.com/api/v2/user/create - 
+
+newer version should not break the older versions
+1 - url versioning 
+2 - headers 
+
+idempotency
+
+10 + 2 = 12
+req to server <=> same response
+get - idempotent call
+post - not idempotent call
+select 
+update, insert and delete 
+
+
+// git
+// jenkins
+
+
+
+
+
