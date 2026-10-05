@@ -22,3 +22,19 @@ git checkout main
 
 create and switch
 git checkout -b emp2-branch
+
+git add 
+git commit -m "msg"
+git push
+
+
+
+
+General
+Source code management
+Trigger
+Environment
+Build
+post build actions
+
+

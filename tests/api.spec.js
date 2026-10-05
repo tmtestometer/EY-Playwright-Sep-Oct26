@@ -22,7 +22,7 @@ test.describe.configure(
 )
 test.describe(() => {
         let assetID = "";
-        test("post api",  async ({ request }) => {
+        test("post api @smoke",  async ({ request }) => {
                 let url = "https://api.restful-api.dev/objects";
                 let response = await request.post(url, {
                     headers : {
@@ -48,7 +48,7 @@ test.describe(() => {
 
         });
 // update 
-        test("put api",  async ({ request }) => {
+        test("put api @smoke",  async ({ request }) => {
                 let url = "https://api.restful-api.dev/objects/"+assetID;
                 let response = await request.put(url, {
                     headers : {
