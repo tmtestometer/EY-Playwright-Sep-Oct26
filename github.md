@@ -14,3 +14,11 @@ DVCS
 
 
 
+create a new branch 
+git branch emp1
+
+switch to another branhc
+git checkout main
+
+create and switch
+git checkout -b emp2-branch
