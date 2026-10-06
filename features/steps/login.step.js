@@ -34,7 +34,6 @@ Then("user validate dashboard", function(){
 Then("user able to see errormsg {string}", async function(errorMsg){
     let actualErrorMsg = await loginObject.getErrorMsg();
     console.log(actualErrorMsg);
-    //expect.soft(actualErrorMsg).toBe(data.errorMsg);
 })
 
 
