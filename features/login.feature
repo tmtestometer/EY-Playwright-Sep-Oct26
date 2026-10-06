@@ -1,9 +1,7 @@
 Feature: login testcases
 
   Background:
-    Given user open "chrome"
-    And user navidate to "https://www.saucedemo.com"
-
+    Given user navigate to "https://www.saucedemo.com"
 
   @positive @JIRA-1234 @valid @sanity
   Scenario: verify user able to see dashboard with correct credentials

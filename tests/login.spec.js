@@ -5,7 +5,7 @@ import { LoginPage } from '../pages/loginpage.js';
 
 
 //for(let data of testdata){
-  test(`${data.testname}`,  async ({ page }) => {
+  test(`${data.testname}`,  async ({ browser, context, page }) => {
 
     loginPageObject = new LoginPage(page);
     await page.goto('https://www.saucedemo.com/'); // 200 ms

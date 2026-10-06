@@ -10,12 +10,10 @@ export class LoginPage{
         await  this.username_box.fill(username); 
     }
 
-
     async enterPassword(password){
          await this.page.locator("//html/body/div/div/div/div/div/div/form/div[2]/input").click();
          await this.page.locator("//html/body/div/div/div/div/div/div/form/div[2]/input").fill(password);
     }
-
 
     async clickLogin(){
         await this.page.locator("[data-test=\"login-button\"]").click();
@@ -31,5 +29,4 @@ export class LoginPage{
         let actualErrorMsg = await this.page.locator('[data-test="error"]').textContent();
         return actualErrorMsg;
     }
-
 }

@@ -130,4 +130,9 @@ update, insert and delete
 
 
 
+npx playwright test 
+playwirght.config.js 
 
+
+npx cucumber-js 
+cucumber.js 
