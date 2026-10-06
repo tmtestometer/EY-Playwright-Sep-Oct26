@@ -136,3 +136,18 @@ playwirght.config.js
 
 npx cucumber-js 
 cucumber.js 
+
+
+| label | value   |
+      | name  | Vaibhav |
+      | age   |      34 |
+
+
+
+      {
+        "label":"name",
+        "value":"Vaibhav"
+      },{
+        "label":"age",
+        "value":"34"
+      }

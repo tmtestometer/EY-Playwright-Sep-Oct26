@@ -9,6 +9,10 @@ Feature: login testcases
     And user enter "secret_Sauce" in password box
     And user click on login button
     Then user validate dashboard
+    Then user validate below label with values
+      | label | value   |
+      | name  | Vaibhav |
+      | age   |      34 |
 
   @negative @JIRA012413 @invalid @sanity
   Scenario Outline: verify errormsg for username <username> and password <password>
