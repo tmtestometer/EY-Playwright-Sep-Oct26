@@ -18,10 +18,49 @@ test('testcase 1', async({ page }) => {
 
     await page.getByText("Test2 File").click();
     let test1Tab = await popupPromise;
-    await test1Tab.waitForLoadState();
+
+    // page
+    // domcontentloaded - DOM 
+    // load = DOM + all resources associate (image, files etc)
+    // networkidle = network call
+    await test1Tab.waitForLoadState("load", {timeout: 50000});
+    
+await test1Tab.waitForFunction(() => {
+    window.appReady === true , {timeout: 30000 }
+})
+
+    // element
+    await test1Tab.waitForSelector('[id="username"]', {
+        state: 'visible',
+        timeout: 50000
+    })
+
+    await test1Tab.locator('[id="username"]').waitFor({
+        state : 'visible', 
+        timeout : 30000
+    });
+    // action chaining 
+
+    // table, div , input 
+    await page.locator("table").locator("div").waitFor({
+        state:"visible"
+    }).locator("input");
+
+
+    let price = await page.locator('[data-test="inventory-item"]')
+        .filter({hasText : "Sauce Labs Bike Light"})
+            .locator('data-test="inventory-item-price"').textContent();
+
 
     await test1Tab.locator('[id="username"]').fill("Vaibhav");
     await test1Tab.locator('[id="password"]').fill("Vaibhav");
+    
+    // wait 5 sec
+    await expect(test1Tab.locator('[id="username"]')).toBeVisible({timeout: 10000})
     await test1Tab.waitForTimeout(5000);
-  
+    
+    await test1Tab.waitFo
+// 30 sec - locating 
+// 5 sec - assertion
+
  });
