@@ -14,7 +14,7 @@ export class DashboardPage{
     }
 
     async clickLogin(){
-        await this.page.locator("#loginbtn").click();
+        await this.page.locator("#loginbtn").click()
     }
 
 }

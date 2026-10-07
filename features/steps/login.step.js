@@ -36,7 +36,6 @@ Then("user able to see errormsg {string}", async function(errorMsg){
     console.log(actualErrorMsg);
 })
 
-
 Then("user validate below label with values" , async function(dataTable){
     const data = dataTable.rowHash();
     

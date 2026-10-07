@@ -11,9 +11,9 @@ test('verify user able to login payment', async ({ page }) => {
 
 test('verify user able to login1 payment', async ({ page }) => {
   await page.goto('https://www.saucedemo.com/');
-  await page.locator('[data-test="username"]').click();
+  await page.locator('[data-test="username"]').click({button: "right", clickCount : 10})
   await page.locator('[data-test="username"]').fill('standard_user');
-  await page.locator('[data-test="password"]').click();
+  await page.locator('[data-test="password"]').dblclick();
   await page.locator('[data-test="password"]').fill('secret_sauce');
   await page.locator('[data-test="login-button"]').click();
 });
