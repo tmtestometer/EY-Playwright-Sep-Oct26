@@ -47,6 +47,9 @@ await test1Tab.waitForFunction(() => {
     }).locator("input");
 
 
+    let username_locators = ['[data-test="username"]','[id="user-name"]','[name="user-name"]']
+
+
     let price = await page.locator('[data-test="inventory-item"]')
         .filter({hasText : "Sauce Labs Bike Light"})
             .locator('data-test="inventory-item-price"').textContent();
