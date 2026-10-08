@@ -1,0 +1,19 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "..",
+    "paths": {
+      "@playwright/test": [
+        "tests/support/playwright-test-bridge.ts"
+      ]
+    },
+    "types": [
+      "node",
+      "@playwright/test"
+    ]
+  },
+  "include": [
+    "./**/*.ts"
+  ],
+  "exclude": []
+}

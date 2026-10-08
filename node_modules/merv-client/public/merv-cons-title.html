@@ -1,0 +1,2791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<!-- merv-cons-title-page-v16 -->
+<title>Suite Based Summary — consolidated</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+
+      :root {
+        --merv-grad: linear-gradient(135deg, #e90101, #c20000);
+        --sidebar-bg: #f2f3f5;
+        --sidebar-border: #e6e8ec;
+        --nav-text: #4a4a4a;
+        --nav-muted: #6b6b6b;
+        --nav-active-bg: #fdeaea;
+        --nav-active-text: #c20000;
+      }
+      html {
+        scroll-behavior: smooth;
+        font-family: 'Roboto', system-ui, -apple-system, sans-serif;
+      }
+      body {
+        font-family: 'Roboto', system-ui, -apple-system, sans-serif;
+        margin: 0;
+        padding: 0;
+        background: #fafafa;
+        color: #333;
+      }
+      button,
+      input,
+      select,
+      textarea {
+        font-family: inherit;
+      }
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        letter-spacing: 0.5px;
+      }
+      .main-wrapper {
+        display: flex;
+        min-height: 100vh;
+      }
+      .sidebar {
+        width: 400px;
+        background: var(--sidebar-bg);
+        color: var(--nav-text);
+        padding: 20px 16px;
+        overflow-y: auto;
+        position: fixed;
+        height: 100vh;
+        box-shadow: 1px 0 0 var(--sidebar-border);
+        box-sizing: border-box;
+      }
+      .sidebar-brand {
+        margin-bottom: 20px;
+        padding-bottom: 18px;
+        border-bottom: 1px solid var(--sidebar-border);
+        text-align: center;
+      }
+      .brand-logo {
+        max-width: 180px;
+        height: auto;
+        display: block;
+        margin: 0 auto;
+      }
+      .sidebar-local-label {
+        margin: 12px 0 0;
+        padding: 0;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--nav-active-text);
+        letter-spacing: 0.04em;
+        text-align: center;
+        display: block;
+        text-decoration: none;
+        cursor: pointer;
+      }
+      .sidebar-local-label:hover {
+        color: #c20000;
+        text-decoration: underline;
+        text-underline-offset: 2px;
+      }
+      .sidebar-filters-wrap {
+        margin-bottom: 14px;
+        padding-bottom: 14px;
+        border-bottom: 1px solid var(--sidebar-border);
+      }
+      .sidebar-search-row {
+        display: flex;
+        align-items: stretch;
+        gap: 8px;
+        margin-bottom: 0;
+      }
+      .sidebar-search-row .sidebar-search {
+        flex: 1;
+        min-width: 0;
+        margin-bottom: 0;
+      }
+      .sidebar-search-row .sidebar-search input {
+        width: 100%;
+      }
+      .sidebar-filter-btn {
+        flex-shrink: 0;
+        width: 42px;
+        padding: 0;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        background: #fff;
+        color: #555;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .sidebar-filter-btn:hover {
+        border-color: #e90101;
+        color: var(--nav-active-text);
+      }
+      .sidebar-filter-btn[aria-expanded='true'] {
+        background: var(--nav-active-bg);
+        border-color: var(--nav-active-text);
+        color: var(--nav-active-text);
+      }
+      .suite-tag-panel {
+        margin-top: 10px;
+        padding: 12px;
+        background: #fff;
+        border: 1px solid #e8eaed;
+        border-radius: 8px;
+        max-height: min(40vh, 320px);
+        overflow: auto;
+      }
+      .suite-tag-panel[hidden] {
+        display: none !important;
+      }
+      .suite-adv-label {
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #6b7280;
+        margin: 0 0 6px;
+      }
+      .suite-adv-tag-cloud {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 0;
+        min-height: 24px;
+      }
+      .merv-tags-shell.merv-tags-collapsed {
+        overflow: hidden;
+      }
+      .merv-tags-shell.merv-tags-expanded {
+        overflow: visible;
+      }
+      .merv-tags-more {
+        display: inline-block;
+        margin-top: 4px;
+        padding: 0 4px;
+        border: none;
+        background: transparent;
+        color: #0d47a1;
+        font-size: 11px;
+        font-weight: 700;
+        cursor: pointer;
+        text-transform: lowercase;
+      }
+      .merv-tags-more[hidden] {
+        display: none !important;
+      }
+      .merv-tags-more:hover {
+        text-decoration: underline;
+      }
+      .suite-adv-tag-pill {
+        border: 1px solid #d6dbe2;
+        background: #f8f9fa;
+        color: #374151;
+        border-radius: 999px;
+        padding: 4px 9px;
+        font-size: 11px;
+        font-weight: 600;
+        cursor: pointer;
+        line-height: 1.2;
+      }
+      .suite-adv-tag-pill:hover {
+        border-color: #e90101;
+        color: var(--nav-active-text);
+      }
+      .suite-adv-tag-pill.selected {
+        background: var(--nav-active-bg);
+        border-color: var(--nav-active-text);
+        color: var(--nav-active-text);
+      }
+      .suite-adv-tag-empty {
+        font-size: 11px;
+        color: #9ca3af;
+      }
+      .suite-adv-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin-top: 8px;
+        flex-wrap: wrap;
+      }
+      .suite-adv-clear {
+        padding: 6px 10px;
+        border: 1px solid #d6dbe2;
+        border-radius: 6px;
+        background: #fff;
+        font-size: 11px;
+        font-weight: 600;
+        cursor: pointer;
+        color: #374151;
+      }
+      .suite-adv-clear:hover {
+        border-color: #e90101;
+        color: var(--nav-active-text);
+      }
+      #suite-adv-filter-status {
+        font-size: 11px;
+        color: #6b7280;
+      }
+      .sidebar-search {
+        margin-bottom: 16px;
+      }
+      .sidebar-search input {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        background: #fff;
+        color: #333;
+        font-size: 14px;
+        box-sizing: border-box;
+      }
+      .sidebar-search input::placeholder {
+        color: #999;
+      }
+      .sidebar-search input:focus {
+        outline: 2px solid rgba(233, 1, 1, 0.25);
+        border-color: #e90101;
+      }
+      .sidebar-filters {
+        margin-bottom: 16px;
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+      .filter-btn {
+        flex: 1;
+        min-width: 56px;
+        padding: 8px 10px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        background: #fff;
+        color: var(--nav-text);
+        font-size: 11px;
+        cursor: pointer;
+      }
+      .filter-btn.active {
+        background: var(--merv-grad);
+        color: #fff;
+        border-color: transparent;
+        font-weight: 700;
+      }
+      .sidebar h2 {
+        color: #333;
+        margin-top: 0;
+        margin-bottom: 10px;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+      }
+      .sidebar-item {
+        padding: 12px 12px;
+        margin: 4px 0;
+        border-radius: 6px;
+        cursor: pointer;
+        border-left: 4px solid transparent;
+        background: #eceff3;
+        transition: background 0.15s;
+      }
+      .sidebar-item:hover {
+        background: #e3e7ec;
+      }
+      .sidebar-item.active {
+        background: #eceff3;
+        border-left-color: #e90101;
+        box-shadow: none;
+      }
+      .sidebar-item-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+      .sidebar-item-name {
+        font-weight: 600;
+        color: #222;
+        font-size: 14px;
+        display: block;
+        white-space: normal;
+        line-height: 1.35;
+        word-break: break-word;
+        overflow-wrap: anywhere;
+      }
+      .sidebar-status-tag {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: #dfe4ea;
+        color: #111;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+      .sidebar-status-tag.pass {
+        background: #e8f5e9;
+        color: #1b5e20;
+      }
+      .sidebar-status-tag.fail {
+        background: #ffebee;
+        color: #b71c1c;
+      }
+      .sidebar-status-tag.skip {
+        background: #fff8e1;
+        color: #e65100;
+      }
+      .sidebar-status-tag.active {
+        background: #e3f2fd;
+        color: #0d47a1;
+      }
+      .content-area {
+        margin-left: 400px;
+        flex: 1;
+        padding: 20px;
+      }
+      .report-toolbar {
+        margin-bottom: 14px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .shots-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        font-weight: 700;
+        color: #444;
+        user-select: none;
+      }
+      .shots-toggle input {
+        width: 16px;
+        height: 16px;
+        accent-color: #e90101;
+      }
+      body.hide-shots .screenshots {
+        display: none !important;
+      }
+      .test-step-title.has-shot {
+        cursor: pointer;
+      }
+      .test-step-title.has-shot:hover,
+      .test-step-title.has-shot.shots-open {
+        color: #c20000;
+      }
+      .test-step-title .step-shot-icon {
+        margin-right: 6px;
+        opacity: 0.85;
+        font-size: 13px;
+      }
+      .test-step-hd.has-shot-hd {
+        cursor: pointer;
+      }
+      .test-step-hd.has-shot-hd:hover .test-step-title.has-shot {
+        color: #c20000;
+      }
+      .step-screenshots {
+        display: none;
+        margin-top: 8px;
+      }
+      body:not(.hide-shots) .step-screenshots {
+        display: block !important;
+      }
+      body.hide-shots .step-screenshots.open {
+        display: block !important;
+      }
+      .step-screenshots .screenshot {
+        margin: 10px 0;
+      }
+      .step-screenshots .screenshot img,
+      .step-screenshots .screenshot video {
+        display: block;
+        max-width: 800px;
+        margin: 10px 0;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+      .step-screenshots .screenshot img {
+        cursor: pointer;
+      }
+      .step-screenshots .screenshot video {
+        background: #111;
+      }
+      .merv-case-videos {
+        margin-top: 18px;
+        padding-top: 12px;
+        border-top: 1px solid #e5e7eb;
+      }
+      .merv-case-videos-heading {
+        margin: 0 0 10px;
+        font-size: 13px;
+        font-weight: 700;
+        color: #374151;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .merv-case-videos .merv-case-video {
+        margin: 10px 0;
+      }
+      .merv-case-videos video {
+        display: block;
+        max-width: min(800px, 100%);
+        width: 100%;
+        background: #111;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+      .local-dash {
+        color: #c20000;
+        font-weight: 600;
+        text-decoration: none;
+        font-size: 14px;
+      }
+      .local-dash:hover {
+        text-decoration: underline;
+      }
+      .report-toolbar-links {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+      }
+      .merv-share-modal {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 10050;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+      .merv-share-modal.open {
+        display: flex;
+      }
+      .merv-share-backdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(17, 24, 39, 0.45);
+      }
+      .merv-share-panel {
+        position: relative;
+        z-index: 1;
+        width: min(560px, 100%);
+        max-height: min(90vh, 720px);
+        overflow: auto;
+        background: #fff;
+        border-radius: 14px;
+        border: 1px solid #e8eaed;
+        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.22);
+        padding: 20px 22px 18px;
+      }
+      .merv-share-panel h2 {
+        margin: 0 0 6px;
+        font-size: 18px;
+        color: #1a1a1a;
+      }
+      .merv-share-panel .share-sub {
+        margin: 0 0 14px;
+        font-size: 13px;
+        color: #6b7280;
+      }
+      .merv-share-row {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 14px;
+      }
+      .merv-share-row input {
+        flex: 1;
+        min-width: 0;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        padding: 10px 12px;
+        font-size: 13px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      }
+      .merv-share-copy {
+        appearance: none;
+        border: none;
+        border-radius: 8px;
+        padding: 0 14px;
+        background: linear-gradient(180deg, #e90101, #c20000);
+        color: #fff;
+        font-weight: 700;
+        font-size: 13px;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      .merv-share-copy:hover {
+        filter: brightness(1.05);
+      }
+      .merv-share-status {
+        min-height: 18px;
+        margin: -6px 0 12px;
+        font-size: 12px;
+        color: #1b5e20;
+        font-weight: 600;
+      }
+      .merv-share-warn {
+        margin: 0 0 12px;
+        padding: 10px 12px;
+        border-radius: 10px;
+        background: #fff7ed;
+        border: 1px solid #fed7aa;
+        color: #9a3412;
+        font-size: 13px;
+        line-height: 1.45;
+      }
+      .merv-share-notes {
+        margin: 0;
+        padding-left: 18px;
+        font-size: 13px;
+        line-height: 1.55;
+        color: #374151;
+      }
+      .merv-share-notes li {
+        margin: 0 0 10px;
+      }
+      .merv-share-notes code {
+        font-size: 12px;
+        background: #f3f4f6;
+        padding: 1px 5px;
+        border-radius: 4px;
+      }
+      .merv-share-close {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        border: none;
+        background: transparent;
+        font-size: 22px;
+        line-height: 1;
+        color: #6b7280;
+        cursor: pointer;
+      }
+      .merv-share-close:hover {
+        color: #111;
+      }
+      .failure-json-link {
+        color: #b71c1c;
+        font-weight: 600;
+        text-decoration: none;
+        font-size: 13px;
+        white-space: nowrap;
+      }
+      .failure-json-link:hover {
+        text-decoration: underline;
+      }
+      .failure-json-link[hidden] {
+        display: none !important;
+      }
+      .failure-json-link.is-empty {
+        opacity: 0.55;
+        pointer-events: none;
+        cursor: default;
+      }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: #fff;
+        padding: 24px;
+        border-radius: 10px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+      }
+      h1 {
+        color: #222;
+        border-bottom: none;
+        padding-bottom: 0;
+        margin-top: 0;
+        margin-bottom: 0;
+        font-size: 26px;
+        flex: 1;
+        min-width: 0;
+      }
+      .suite-heading {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 14px;
+        flex-wrap: wrap;
+        border-bottom: 4px solid #c20000;
+        padding-bottom: 12px;
+        margin-bottom: 10px;
+      }
+      .suite-heading-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+        margin-top: 4px;
+      }
+      .share-btn,
+      .download-btn {
+        appearance: none;
+        border: 1px solid #c20000;
+        background: #fff;
+        color: #c20000;
+        font: inherit;
+        font-size: 13px;
+        font-weight: 700;
+        padding: 6px 12px;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+      .share-btn:hover,
+      .download-btn:hover {
+        background: #fdeaea;
+      }
+      .download-btn {
+        background: linear-gradient(180deg, #e90101, #c20000);
+        color: #fff;
+        border-color: #c20000;
+      }
+      .download-btn:hover {
+        filter: brightness(1.05);
+        background: linear-gradient(180deg, #e90101, #c20000);
+      }
+      .download-btn:disabled {
+        opacity: 0.65;
+        cursor: wait;
+        filter: none;
+      }
+      .merv-download-toast {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 10060;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+      .merv-download-toast.open {
+        display: flex;
+      }
+      .merv-download-toast-backdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(17, 24, 39, 0.4);
+      }
+      .merv-download-toast-panel {
+        position: relative;
+        z-index: 1;
+        width: min(420px, 100%);
+        background: #fff;
+        border-radius: 14px;
+        border: 1px solid #e8eaed;
+        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.22);
+        padding: 22px 22px 18px;
+        text-align: center;
+      }
+      .merv-download-toast-panel h2 {
+        margin: 0 0 8px;
+        font-size: 18px;
+        color: #111;
+      }
+      .merv-download-toast-panel .size-line {
+        margin: 0 0 14px;
+        font-size: 15px;
+        color: #374151;
+      }
+      .merv-download-toast-panel .size-line strong {
+        color: #c20000;
+      }
+      .merv-download-toast-panel .detail {
+        margin: 0 0 16px;
+        font-size: 13px;
+        color: #6b7280;
+        line-height: 1.45;
+      }
+      .merv-download-toast-ok {
+        appearance: none;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 18px;
+        background: linear-gradient(180deg, #e90101, #c20000);
+        color: #fff;
+        font-weight: 700;
+        font-size: 13px;
+        cursor: pointer;
+      }
+      .live-banner {
+        margin: 0 0 14px;
+        font-size: 12px;
+        color: #666;
+        min-height: 1em;
+      }
+      .report-folder-meta {
+        margin: -8px 0 14px;
+        font-size: 12px;
+        color: #4b5563;
+        word-break: break-word;
+      }
+      .stat-row-4 {
+        display: flex;
+        flex-direction: row;
+        gap: 8px;
+        margin-bottom: 16px;
+      }
+      .stat-card {
+        background-color: #fff;
+        border-radius: 8px;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+        border: 1px solid #eee;
+      }
+      a.stat-card {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+        cursor: pointer;
+      }
+      a.stat-card:hover {
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+        border-color: #ddd;
+      }
+      .stat-row-4 .stat-card {
+        flex: 1;
+        min-width: 0;
+        padding: 12px 6px;
+      }
+      .stat-card h3 {
+        margin: 0 0 6px 0;
+        color: #666;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        line-height: 1.2;
+      }
+      .stat-card .stat-value {
+        font-size: 22px;
+        font-weight: 700;
+        color: #333;
+        line-height: 1.1;
+      }
+      .stat-card.total .stat-value {
+        color: #c20000;
+      }
+      .stat-card.passed .stat-value {
+        color: #4caf50;
+      }
+      .stat-card.failed .stat-value {
+        color: #f44336;
+      }
+      .stat-card.skipped .stat-value {
+        color: #ff9800;
+      }
+      .pie-chart-container {
+        text-align: center;
+        background: #fff;
+        padding: 14px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+        border: 1px solid #eee;
+      }
+      .pie-legend {
+        display: flex;
+        justify-content: center;
+        gap: 16px;
+        margin-top: 12px;
+        flex-wrap: wrap;
+      }
+      .pie-legend-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .pie-legend-color {
+        width: 14px;
+        height: 14px;
+        border-radius: 3px;
+        flex-shrink: 0;
+      }
+      .pie-legend-label {
+        font-size: 12px;
+        color: #333;
+      }
+      .stats-section {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        align-items: flex-start;
+      }
+      .stats-left-col {
+        flex: 0 0 40%;
+        max-width: 40%;
+        min-width: 260px;
+      }
+      .stats-right-col {
+        flex: 1 1 55%;
+        min-width: 280px;
+      }
+      @media (max-width: 900px) {
+        .stats-left-col,
+        .stats-right-col {
+          flex: 1 1 100%;
+          max-width: 100%;
+        }
+      }
+      .failure-reasons-panel {
+        background: #fff;
+        border: 1px solid #eee;
+        border-radius: 8px;
+        padding: 14px 16px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+        max-height: 420px;
+        overflow: auto;
+      }
+      .failure-reasons-panel h3 {
+        margin: 0 0 12px 0;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #c20000;
+      }
+      .failure-reason-empty {
+        color: #888;
+        font-size: 13px;
+        margin: 0;
+      }
+      .failure-reason-group {
+        border: 1px solid #eef0f3;
+        border-radius: 8px;
+        padding: 8px 10px;
+        margin: 8px 0;
+        background: #fcfcfd;
+      }
+      .failure-reason-row {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 10px 8px;
+        cursor: pointer;
+        border-radius: 6px;
+        margin: 0 -4px;
+        user-select: none;
+      }
+      .failure-reason-row:hover {
+        background: #f3f4f6;
+      }
+      .failure-reason-caret {
+        flex-shrink: 0;
+        font-size: 10px;
+        color: #c20000;
+        margin-right: 6px;
+        margin-top: 4px;
+        transition: transform 0.2s ease;
+        line-height: 1;
+      }
+      .failure-reason-group.open .failure-reason-caret {
+        transform: rotate(90deg);
+      }
+      .failure-reason-text {
+        flex: 1;
+        min-width: 0;
+        font-size: 13px;
+        color: #333;
+        line-height: 1.45;
+        word-break: break-word;
+        white-space: pre-wrap;
+      }
+      .failure-reason-count {
+        flex-shrink: 0;
+        font-weight: 700;
+        font-size: 13px;
+        color: #f44336;
+        min-width: 2em;
+        text-align: right;
+      }
+      .failure-related-cases {
+        display: none;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 6px;
+        padding: 4px 8px 8px 22px;
+        border-top: 1px solid #f0f0f0;
+      }
+      .failure-reason-group.open .failure-related-cases {
+        display: flex;
+      }
+      .failure-case-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+      .failure-case-link {
+        border: none;
+        background: transparent;
+        color: #0d47a1;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        padding: 0;
+        text-align: left;
+        text-decoration: underline;
+        text-underline-offset: 2px;
+      }
+      .failure-case-link:hover {
+        color: #08306f;
+      }
+      .failure-case-thumb {
+        width: 72px;
+        height: 42px;
+        object-fit: cover;
+        border: 1px solid #d7dce2;
+        border-radius: 6px;
+        cursor: pointer;
+        flex-shrink: 0;
+      }
+      .test-case {
+        margin: 15px 0;
+        padding: 15px;
+        border-left: 4px solid #ddd;
+        background-color: #f9f9f9;
+        color: #333;
+      }
+      .test-case.passed {
+        border-left-color: #4caf50;
+      }
+      .test-case.failed {
+        border-left-color: #f44336;
+      }
+      .test-case.skipped {
+        border-left-color: #ff9800;
+      }
+      .test-case.in_progress {
+        border-left-color: #2196f3;
+      }
+      .testcase-desc {
+        margin: 8px 0 14px;
+        padding: 0;
+        font-size: 13px;
+        line-height: 1.45;
+        color: #555;
+        word-break: break-word;
+      }
+      .testcase-heading {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 10px 12px;
+        margin: -2px -2px 12px;
+        background: #fff;
+        border: 1px solid #eceff3;
+        border-radius: 10px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+      }
+      .testcase-title {
+        margin: 0;
+        font-size: 26px;
+        font-weight: 700;
+        letter-spacing: 0.01em;
+        color: #042664;
+        line-height: 1.3;
+        word-break: break-word;
+      }
+      .testcase-status-chip {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 6px 12px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        border: 1px solid #d0d7de;
+        background: #eef2f6;
+        color: #364152;
+        white-space: nowrap;
+      }
+      .testcase-status-chip.passed {
+        background: #e8f5e9;
+        color: #1b5e20;
+        border-color: #c8e6c9;
+      }
+      .testcase-status-chip.failed {
+        background: #ffebee;
+        color: #b71c1c;
+        border-color: #ffcdd2;
+      }
+      .testcase-status-chip.skipped {
+        background: #fff8e1;
+        color: #e65100;
+        border-color: #ffe0b2;
+      }
+      .testcase-status-chip.in_progress {
+        background: #e3f2fd;
+        color: #0d47a1;
+        border-color: #bbdefb;
+      }
+      .testcase-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 6px 0 10px;
+      }
+      .testcase-tag {
+        display: inline-flex;
+        align-items: center;
+        height: 20px;
+        padding: 0 10px;
+        border-radius: 999px;
+        background: #eaf1ff;
+        border: 1px solid #cfdcff;
+        color: #153a7a;
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 20px;
+      }
+      .sidebar-item-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        margin-top: 6px;
+      }
+      .sidebar-item-tag {
+        display: inline-flex;
+        align-items: center;
+        height: 16px;
+        padding: 0 7px;
+        border-radius: 999px;
+        background: #eef4ff;
+        border: 1px solid #d4def2;
+        color: #163b7a;
+        font-size: 10px;
+        font-weight: 600;
+        line-height: 16px;
+      }
+      .testcase-meta-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 10px;
+        margin: 0 0 12px;
+      }
+      .testcase-meta-item {
+        background: #fff;
+        border: 1px solid #eceff3;
+        border-radius: 10px;
+        padding: 10px 12px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+      }
+      .testcase-meta-label {
+        display: block;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #6b7280;
+        margin-bottom: 4px;
+      }
+      .testcase-meta-value {
+        font-size: 13px;
+        font-weight: 600;
+        color: #1f2937;
+        word-break: break-word;
+      }
+      .error {
+        color: #f44336;
+        font-size: 0.9em;
+        margin-top: 5px;
+        background-color: #ffebee;
+        padding: 8px;
+        border-radius: 3px;
+        border-left: 3px solid #f44336;
+        white-space: pre-wrap;
+        word-break: break-word;
+        line-height: 1.45;
+      }
+      .test-step {
+        margin: 8px 0;
+        padding: 8px;
+        background-color: #fff;
+        border-radius: 3px;
+        color: #333;
+      }
+      .test-step.passed {
+        border-left: 3px solid #4caf50;
+      }
+      .test-step.failed {
+        border-left: 3px solid #f44336;
+      }
+      .test-step.skipped {
+        border-left: 3px solid #ff9800;
+      }
+      .test-step.in_progress {
+        border-left: 3px solid #ffc107;
+      }
+      .step-logs {
+        margin-top: 12px;
+      }
+      .step-logs > p,
+      .merv-case-logs-heading {
+        color: #333;
+        font-weight: 700;
+        margin: 0 0 8px;
+        font-size: 13px;
+      }
+      .merv-case-logs-block {
+        margin-top: 18px;
+      }
+      .log-container {
+        background: #f5f5f5;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        padding: 10px;
+        max-height: 360px;
+        overflow-y: auto;
+        font-family: ui-monospace, 'Cascadia Code', 'Courier New', monospace;
+        font-size: 12px;
+        line-height: 1.45;
+      }
+      .log-line {
+        padding: 3px 0;
+        border-bottom: 1px solid #eee;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+      }
+      .log-line:last-child {
+        border-bottom: none;
+      }
+      .log-info {
+        color: #333;
+      }
+      .log-error {
+        color: #d32f2f;
+        font-weight: 700;
+        background: #ffebee;
+        padding: 2px 5px;
+        border-radius: 2px;
+      }
+      .log-warn {
+        color: #f57c00;
+        background: #fff3e0;
+        padding: 2px 5px;
+        border-radius: 2px;
+      }
+      .log-debug {
+        color: #616161;
+      }
+      .log-trace {
+        color: #7c3aed;
+      }
+      .test-step-hd {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        margin: 0 0 6px;
+        flex-wrap: wrap;
+      }
+      .test-step-title {
+        margin: 0;
+        flex: 1;
+        min-width: 0;
+        font-size: 14px;
+        font-weight: 600;
+        color: #333;
+        line-height: 1.35;
+        word-break: break-word;
+      }
+      .test-step-badges {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+        flex-wrap: wrap;
+      }
+      .step-type-pill {
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #424242;
+        background: linear-gradient(180deg, #f0f3fa, #e8ecf6);
+        border: 1px solid rgba(0, 0, 0, 0.06);
+        padding: 3px 10px;
+        border-radius: 999px;
+      }
+      .step-meta {
+        margin-top: 8px;
+        padding: 10px 12px;
+        background: #f8fafc;
+        border: 1px solid #e8ecf2;
+        border-radius: 8px;
+        font-size: 13px;
+      }
+      .step-meta-row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        margin-top: 6px;
+      }
+      .step-meta-row:first-child {
+        margin-top: 0;
+      }
+      .step-meta-key {
+        min-width: 88px;
+        font-weight: 700;
+        color: #555;
+        flex-shrink: 0;
+      }
+      .step-meta-val {
+        flex: 1;
+        min-width: 120px;
+        word-break: break-word;
+        color: #222;
+        white-space: pre-wrap;
+      }
+      .merv-api-card {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+      }
+      .merv-api-section {
+        border-radius: 10px;
+        border: 1px solid transparent;
+        overflow: hidden;
+      }
+      .merv-api-section--request {
+        border-color: #93c5fd;
+        background: linear-gradient(180deg, #eff6ff 0%, #f8fbff 100%);
+      }
+      .merv-api-section--response {
+        border-color: #86efac;
+        background: linear-gradient(180deg, #ecfdf5 0%, #f7fdf9 100%);
+      }
+      .merv-api-section-title {
+        margin: 0;
+        padding: 8px 12px;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .merv-api-section--request .merv-api-section-title {
+        color: #1d4ed8;
+        background: rgba(59, 130, 246, 0.12);
+        border-bottom: 1px solid #bfdbfe;
+      }
+      .merv-api-section--response .merv-api-section-title {
+        color: #047857;
+        background: rgba(16, 185, 129, 0.12);
+        border-bottom: 1px solid #bbf7d0;
+      }
+      .merv-api-rows {
+        padding: 8px 12px 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .merv-api-row {
+        display: grid;
+        grid-template-columns: 148px minmax(0, 1fr);
+        gap: 8px 12px;
+        align-items: start;
+      }
+      @media (max-width: 640px) {
+        .merv-api-row {
+          grid-template-columns: 1fr;
+          gap: 4px;
+        }
+      }
+      .merv-api-key {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        padding-top: 2px;
+      }
+      .merv-api-section--request .merv-api-key {
+        color: #1e40af;
+      }
+      .merv-api-section--response .merv-api-key {
+        color: #065f46;
+      }
+      .merv-api-val {
+        min-width: 0;
+        font-size: 12.5px;
+        color: #111827;
+        word-break: break-word;
+      }
+      .merv-api-val-plain {
+        white-space: pre-wrap;
+      }
+      .merv-api-method {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        color: #1e3a8a;
+        background: #dbeafe;
+        border: 1px solid #93c5fd;
+      }
+      .merv-api-status {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 800;
+        color: #065f46;
+        background: #d1fae5;
+        border: 1px solid #6ee7b7;
+      }
+      .merv-api-status.is-error {
+        color: #991b1b;
+        background: #fee2e2;
+        border-color: #fca5a5;
+      }
+      .merv-api-pre-wrap {
+        margin: 0;
+        padding: 8px 10px;
+        border-radius: 8px;
+        background: rgba(15, 23, 42, 0.04);
+        border: 1px solid rgba(15, 23, 42, 0.08);
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        font-size: 11.5px;
+        line-height: 1.45;
+        white-space: pre-wrap;
+        word-break: break-word;
+        max-height: none;
+        overflow: auto;
+      }
+      .merv-api-pre-wrap.is-collapsed {
+        max-height: 8.7em; /* ~6 lines */
+        overflow: hidden;
+      }
+      .merv-api-show-full {
+        display: inline-block;
+        margin-top: 6px;
+        font-size: 12px;
+        font-weight: 700;
+        color: #c20000;
+        text-decoration: underline;
+        cursor: pointer;
+        background: none;
+        border: 0;
+        padding: 0;
+        font-family: inherit;
+      }
+      .merv-api-show-full:hover {
+        color: #9a0000;
+      }
+      .step-meta-val img,
+      .merv-inline-image,
+      .error img {
+        display: block;
+        max-width: 100%;
+        height: auto;
+        margin: 8px 0;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        background: #fff;
+      }
+      .screenshots {
+        margin-top: 10px;
+      }
+      .screenshot {
+        margin: 10px 0;
+      }
+      .screenshot img {
+        display: block;
+        max-width: 800px;
+        margin: 10px 0;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      .status-pill {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        background: linear-gradient(135deg, #e90101, #c20000);
+        color: #fff;
+        font-size: 11px;
+        font-weight: 700;
+        margin-left: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .status-pill.aborted {
+        background: #6c757d !important;
+      }
+      .testdata-files {
+        margin: 8px 0 0;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        width: 90%;
+        max-width: 90%;
+      }
+      .testdata-file-bar {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 14px;
+        background: linear-gradient(135deg, #4a90d9 0%, #3b7fc4 100%);
+        border-radius: 10px;
+        color: #fff;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .testdata-file-bar-icon {
+        flex: 0 0 36px;
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.15);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        opacity: 0.9;
+      }
+      .testdata-file-bar-info {
+        flex: 1;
+        min-width: 0;
+      }
+      .testdata-file-bar-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+      }
+      .testdata-file-bar-name {
+        font-weight: 600;
+        font-size: 14px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .testdata-file-bar-badge {
+        flex-shrink: 0;
+        font-size: 10px;
+        font-weight: 700;
+        padding: 2px 6px;
+        border-radius: 4px;
+        background: rgba(0, 0, 0, 0.2);
+        color: rgba(255, 255, 255, 0.85);
+      }
+      .testdata-file-bar-size {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.75);
+        margin-top: 2px;
+      }
+      .testdata-file-bar-oversize {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.92);
+        margin-top: 4px;
+        font-style: italic;
+      }
+      .testdata-file-bar-actions {
+        display: flex;
+        gap: 6px;
+        flex-shrink: 0;
+      }
+      .testdata-file-bar-btn {
+        border: none;
+        background: transparent;
+        color: #fff;
+        width: 34px;
+        height: 34px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 16px;
+        line-height: 1;
+      }
+      .testdata-file-bar-btn:hover {
+        background: rgba(255, 255, 255, 0.18);
+      }
+      .testdata-flat-file {
+        border: 1px solid #e6e8ec;
+        border-radius: 8px;
+        background: #f7f8fa;
+        padding: 10px 12px;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .testdata-flat-file-head {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+      .testdata-flat-file-name {
+        font-weight: 600;
+        font-size: 13px;
+        color: #333;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .testdata-flat-file-badge {
+        font-size: 10px;
+        font-weight: 700;
+        padding: 2px 6px;
+        border-radius: 4px;
+        background: #e3f2fd;
+        color: #1565c0;
+      }
+      .testdata-flat-file-preview {
+        margin: 0;
+        padding: 8px 10px;
+        background: #fff;
+        border: 1px solid #e9ecef;
+        border-radius: 6px;
+        font-size: 12px;
+        line-height: 1.45;
+        max-height: 220px;
+        overflow: auto;
+        white-space: pre-wrap;
+        word-break: break-word;
+        color: #333;
+      }
+      .testdata-flat-file-link {
+        display: inline-block;
+        margin-top: 8px;
+        color: #007bff;
+        font-size: 13px;
+        cursor: pointer;
+        text-decoration: underline;
+      }
+      .testdata-image-file {
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .testdata-image-file-preview {
+        display: block;
+        max-width: 100%;
+        max-height: 420px;
+        width: auto;
+        height: auto;
+        border-radius: 6px;
+        border: 1px solid #e9ecef;
+        background: #fff;
+        object-fit: contain;
+        cursor: zoom-in;
+      }
+      .merv-image-lightbox {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 10000;
+      }
+      .merv-image-lightbox.open {
+        display: block;
+      }
+      .merv-image-lightbox-backdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.72);
+      }
+      .merv-image-lightbox-panel {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: min(92vw, 1100px);
+        max-height: 92vh;
+        background: #fff;
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+      }
+      .merv-image-lightbox-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 14px;
+        border-bottom: 1px solid #e9ecef;
+        background: #f8f9fa;
+      }
+      .merv-image-lightbox-title {
+        font-weight: 600;
+        font-size: 14px;
+        color: #333;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        padding-right: 8px;
+      }
+      .merv-image-lightbox-close {
+        border: none;
+        background: transparent;
+        font-size: 22px;
+        line-height: 1;
+        cursor: pointer;
+        color: #666;
+        padding: 0 4px;
+      }
+      .merv-image-lightbox-viewport {
+        flex: 1;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 280px;
+        max-height: calc(92vh - 110px);
+        background: #1a1a1a;
+        padding: 12px;
+        cursor: grab;
+        user-select: none;
+        touch-action: none;
+      }
+      .merv-image-lightbox-viewport.dragging {
+        cursor: grabbing;
+      }
+      .merv-image-lightbox-img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        transform-origin: center center;
+        transition: transform 0.15s ease;
+        pointer-events: none;
+      }
+      .merv-image-lightbox-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 10px 14px;
+        border-top: 1px solid #e9ecef;
+        background: #f8f9fa;
+      }
+      .merv-image-lightbox-toolbar button {
+        border: 1px solid #ced4da;
+        background: #fff;
+        border-radius: 6px;
+        padding: 6px 12px;
+        cursor: pointer;
+        font-size: 13px;
+      }
+      .merv-image-lightbox-toolbar button:hover {
+        background: #f1f3f5;
+      }
+      .merv-image-lightbox-zoom-label {
+        min-width: 48px;
+        text-align: center;
+        font-weight: 600;
+        font-size: 13px;
+        color: #333;
+      }
+    
+
+.cons-detail-panel{display:none;margin-top:24px;padding-top:8px;border-top:2px solid #eee;}
+.cons-detail-panel.active{display:block;}
+.cons-detail-empty{margin-top:24px;padding:28px;background:#f7f8fa;border:1px dashed #d0d5dd;border-radius:10px;color:#888;font-size:14px;text-align:center;}
+.cons-meta-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;margin:16px 0;}
+.cons-meta-card{background:#fff;border:1px solid #eee;border-radius:8px;padding:12px 14px;box-shadow:0 1px 3px rgba(0,0,0,.06);}
+.cons-meta-card .lbl,.fail-box .lbl{font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.04em;}
+.cons-meta-card .val{font-size:14px;font-weight:700;margin-top:4px;color:#222;word-break:break-word;}
+.cons-case-tags,.suite-tags-row{margin-top:10px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;}
+.cons-case-tags .tag-pill,.suite-tags-row .tag-pill,.sidebar-item-tags .tag-pill{display:inline-block;font-size:11px;padding:2px 8px;border-radius:999px;background:#e3f2fd;color:#1565c0;}
+.tag-pill.tag-pass{background:#e8f5e9;color:#1b5e20;font-weight:700;}
+.tag-pill.tag-fail{background:#ffebee;color:#b71c1c;font-weight:700;}
+.status-tag-lg{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.04em;padding:4px 12px;border-radius:999px;text-transform:uppercase;vertical-align:middle;margin-left:8px;}
+.status-tag-lg.pass,.sidebar-status-tag.pass{background:#e8f5e9;color:#1b5e20;}
+.status-tag-lg.fail,.sidebar-status-tag.fail{background:#ffebee;color:#b71c1c;}
+.status-tag-lg.skip,.sidebar-status-tag.skip{background:#fff8e1;color:#e65100;}
+.status-tag-lg.run{background:#eef1f4;color:#333;}
+.suite-info-bar{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin:14px 0 18px;}
+.fail-box{margin:14px 0;padding:12px 14px;background:#fff5f5;border:1px solid #ffcdd2;border-radius:8px;}
+.fail-pre{margin:8px 0 0;white-space:pre-wrap;word-break:break-word;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;color:#b71c1c;line-height:1.45;}
+.cons-instance-list{margin:12px 0 0;padding:0;list-style:none;}
+.cons-instance-list li{background:#f7f8fa;border:1px solid #e6e8ec;border-radius:8px;padding:12px 14px;margin:0 0 8px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;}
+.cons-instance-list a.open-btn{display:inline-block;padding:8px 14px;border-radius:6px;background:linear-gradient(135deg,#e90101,#c20000);color:#fff !important;font-weight:700;font-size:12px;text-decoration:none;flex-shrink:0;}
+.inst-fail{margin-top:6px;font-size:12px;color:#b71c1c;white-space:pre-wrap;word-break:break-word;}
+.cons-detail-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:16px;}
+.cons-detail-actions a#case-latest-link{display:inline-block;padding:10px 16px;border-radius:6px;background:linear-gradient(135deg,#e90101,#c20000);color:#fff !important;font-weight:700;font-size:13px;text-decoration:none;}
+.cons-clear-btn{border:1px solid #e90101;background:#fff;color:#e90101;font-weight:700;border-radius:6px;padding:9px 14px;cursor:pointer;font-size:13px;}
+.cons-clear-btn:hover{background:#fff5f5;}
+.case-section-title{margin:18px 0 8px;font-size:15px;font-weight:700;color:#333;}
+
+
+.suite-tags-row{margin:10px 0 22px !important;padding-bottom:4px;}
+.cons-case-tags{margin-top:10px;margin-bottom:18px !important;}
+.pie-chart-container{max-width:220px !important;margin-left:auto;margin-right:auto;}
+.pie-chart-container canvas{max-width:200px !important;max-height:200px !important;width:200px !important;height:200px !important;}
+
+.inst-row.active{border-color:#e90101;box-shadow:0 0 0 1px rgba(233,1,1,.2);}
+.inst-open-btn{border:0;cursor:pointer;}
+.case-instance-detail{margin-top:16px;padding:16px 18px;background:#fff;border:1px solid #e6e8ec;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.06);}
+.inst-detail-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:8px;}
+.inst-steps{margin:0;padding:0 0 0 18px;}
+.inst-step{margin:0 0 10px;padding:10px 12px;background:#f7f8fa;border-radius:8px;border-left:4px solid #cfd4da;list-style:decimal;}
+.inst-step.pass{border-left-color:#4caf50;}
+.inst-step.fail{border-left-color:#f44336;}
+.inst-step.skip{border-left-color:#ff9800;}
+.inst-step-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;}
+.inst-step-name{font-weight:600;font-size:13px;color:#222;word-break:break-word;}
+.inst-step-ea{margin-top:6px;font-size:12px;color:#555;}
+a#case-latest-link{cursor:pointer;}
+
+.inst-actions{display:flex;gap:8px;align-items:center;flex-shrink:0;}
+.suite-open-btn{display:inline-block;padding:8px 12px;border-radius:6px;border:1px solid #e90101;color:#e90101 !important;background:#fff;font-weight:700;font-size:12px;text-decoration:none;white-space:nowrap;}
+.suite-open-btn:hover{background:#fff5f5;}
+.suite-open-btn-lg{padding:10px 14px;font-size:13px;}
+.inst-detail-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+
+.cons-embed-wrap{margin-top:16px;border:1px solid #e6e8ec;border-radius:10px;overflow:hidden;background:#fff;min-height:480px;}
+.cons-embed-wrap iframe.cons-suite-iframe{display:block;width:100%;min-height:640px;height:70vh;border:0;background:#fff;}
+.cons-embed-label{font-size:12px;font-weight:700;color:#666;text-transform:uppercase;letter-spacing:.04em;margin:16px 0 8px;}
+
+</style>
+</head>
+<body>
+<div class="main-wrapper">
+  <div class="sidebar">
+    <div class="sidebar-brand">
+      <img class="brand-logo" src="https://merv.online/images/logo-red.png" alt="Merv"/>
+      <a class="sidebar-local-label" href="./index.html" title="Open local dashboard">Merv Local</a>
+    </div>
+    <div class="sidebar-filters-wrap">
+      <div class="sidebar-filters" role="group" aria-label="Filter by status">
+        <button type="button" class="filter-btn active" data-status="all">All</button>
+        <button type="button" class="filter-btn" data-status="passed">Pass</button>
+        <button type="button" class="filter-btn" data-status="failed">Fail</button>
+        <button type="button" class="filter-btn" data-status="skipped">Skip</button>
+      </div>
+      <div class="sidebar-search-row">
+        <div class="sidebar-search">
+          <input type="search" id="testcase-search" placeholder="Search test cases…" autocomplete="off"/>
+        </div>
+      </div>
+    </div>
+    <h2>Test Cases</h2>
+    <div id="sidebar-list"></div>
+  </div>
+
+  <div class="content-area">
+    <div class="container">
+      <div class="report-toolbar">
+        <div class="report-toolbar-links">
+          <a class="local-dash" href="./index.html">Local Dashboard</a>
+          <a class="local-dash" href="./index.html" style="margin-left:12px">← Suite Based Summary</a>
+        </div>
+      </div>
+
+      <div class="suite-heading">
+        <h1 id="suite-title"><span class="suite-title-text">Suite Based Summary</span> <span class="status-pill">COMPLETED</span></h1>
+      </div>
+      <p class="live-banner">Consolidated by suite title — latest status across builds. Click a testcase in the sidebar to open details below.</p>
+      <p id="report-folder" class="report-folder-meta"></p>
+
+      <div class="suite-info-bar">
+        <div class="cons-meta-card"><div class="lbl">Total runs</div><div class="val" id="suite-total-runs">0</div></div>
+        <div class="cons-meta-card"><div class="lbl">Start time</div><div class="val" id="suite-start">—</div></div>
+        <div class="cons-meta-card"><div class="lbl">End time</div><div class="val" id="suite-end">—</div></div>
+        <div class="cons-meta-card"><div class="lbl">Duration</div><div class="val" id="suite-duration">—</div></div>
+        <div class="cons-meta-card"><div class="lbl">Executed on</div><div class="val" id="suite-machines">—</div></div>
+      </div>
+      <div class="suite-tags-row" id="suite-tags"></div>
+
+      <div class="stats-section">
+        <div class="stats-left-col">
+          <div class="stat-row-4">
+            <a href="#" class="stat-card total" style="background:white" id="stat-total" title="Show all">
+              <h3>Total</h3>
+              <div id="total-count" class="stat-value">0</div>
+            </a>
+            <div class="stat-card passed"><h3>Passed</h3><div id="passed-count" class="stat-value">0</div></div>
+            <div class="stat-card failed"><h3>Failed</h3><div id="failed-count" class="stat-value">0</div></div>
+            <div class="stat-card skipped"><h3>Skipped</h3><div id="skipped-count" class="stat-value">0</div></div>
+          </div>
+          <div class="pie-chart-container">
+            <canvas id="pieChart" width="300" height="300"></canvas>
+            <div class="pie-legend">
+              <span class="pie-legend-item"><span class="pie-legend-color" style="background:#4caf50"></span><span id="leg-p" class="pie-legend-label">Passed (0)</span></span>
+              <span class="pie-legend-item"><span class="pie-legend-color" style="background:#f44336"></span><span id="leg-f" class="pie-legend-label">Failed (0)</span></span>
+              <span class="pie-legend-item"><span class="pie-legend-color" style="background:#ff9800"></span><span id="leg-k" class="pie-legend-label">Skipped (0)</span></span>
+            </div>
+          </div>
+        </div>
+        <div class="stats-right-col">
+          <div class="failure-reasons-panel" id="failure-reasons-panel">
+            <h3>Failure reasons</h3>
+            <p class="failure-reason-empty">No current failures.</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="cons-detail-empty" class="cons-detail-empty">Select a testcase from the left to see run history, machine, tags, and failure details here.</div>
+
+      <div id="cons-detail" class="cons-detail-panel">
+        <div class="suite-heading">
+          <h1 id="case-title" style="font-size:1.35rem;">Testcase</h1>
+        </div>
+        <div id="case-status-tags" class="cons-case-tags"></div>
+        <div class="cons-case-tags" id="case-tags" style="margin-top:8px;"></div>
+
+        <div class="cons-meta-grid">
+          <div class="cons-meta-card"><div class="lbl">Total runs</div><div class="val" id="case-total-runs">0</div></div>
+          <div class="cons-meta-card"><div class="lbl">Start time</div><div class="val" id="case-start">—</div></div>
+          <div class="cons-meta-card"><div class="lbl">End time</div><div class="val" id="case-end">—</div></div>
+          <div class="cons-meta-card"><div class="lbl">Duration</div><div class="val" id="case-duration">—</div></div>
+          <div class="cons-meta-card"><div class="lbl">Executed on</div><div class="val" id="case-machine">—</div></div>
+          <div class="cons-meta-card"><div class="lbl">Last 5</div><div class="val" id="case-last5">—</div></div>
+          <div class="cons-meta-card"><div class="lbl">Total pass</div><div class="val" id="case-pass">0</div></div>
+          <div class="cons-meta-card"><div class="lbl">Total fail</div><div class="val" id="case-fail">0</div></div>
+          <div class="cons-meta-card"><div class="lbl">Last passed</div><div class="val" id="case-last-pass">—</div></div>
+          <div class="cons-meta-card"><div class="lbl">Last failed</div><div class="val" id="case-last-fail">—</div></div>
+        </div>
+
+        <div id="case-failure" class="fail-box" style="display:none;"></div>
+
+        <h3 class="case-section-title">Associated run instances</h3>
+        <ul class="cons-instance-list" id="case-instances"></ul>
+        <div id="case-instance-detail" class="case-instance-detail" style="display:none;"></div>
+
+        <div class="cons-detail-actions">
+          <a id="case-latest-link" href="#">View latest instance</a>
+          <a id="case-suite-link" class="suite-open-btn suite-open-btn-lg" href="#" target="_blank" rel="noopener noreferrer" style="display:none;">Open in suite report ↗</a>
+          <button type="button" class="cons-clear-btn" id="clear-case">Clear selection</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+(function () {
+  var params = new URLSearchParams(location.search);
+  var suiteTitle = (params.get('suite') || params.get('title') || '').trim();
+  var statusFilter = 'all';
+  var searchQ = '';
+  var rowsCache = [];
+  var selectedKey = '';
+  var pieChart = null;
+  var suiteMeta = { machines: [], tags: [], totalRuns: 0, startMs: 0, endMs: 0 };
+  var snapsByFolder = {};
+  var selectedInstIdx = -1;
+  var selectedCaseRef = null;
+
+  var listEl = document.getElementById('sidebar-list');
+  var searchEl = document.getElementById('testcase-search');
+  var detailEl = document.getElementById('cons-detail');
+  var detailEmpty = document.getElementById('cons-detail-empty');
+
+  function esc(s) {
+    return String(s || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+  function decodeUi(s) {
+    try {
+      return decodeURIComponent(String(s || ''));
+    } catch (e) {
+      return String(s || '');
+    }
+  }
+  function parseTs(v) {
+    if (v == null) return null;
+    if (typeof v === 'number') return new Date(v > 1e11 ? v : v * 1000);
+    if (typeof v === 'string') {
+      var d = new Date(v);
+      return isNaN(d.getTime()) ? null : d;
+    }
+    return null;
+  }
+  function fmtTs(ms) {
+    if (!ms || ms <= 0) return '—';
+    var d = new Date(ms);
+    if (isNaN(d.getTime())) return '—';
+    var mon = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    var dd = (d.getDate() < 10 ? '0' : '') + d.getDate();
+    var h = d.getHours(),
+      amp = h >= 12 ? 'PM' : 'AM';
+    h = h % 12;
+    if (h === 0) h = 12;
+    var mm = (d.getMinutes() < 10 ? '0' : '') + d.getMinutes();
+    return dd + '-' + mon[d.getMonth()] + '-' + d.getFullYear() + ', ' + h + ':' + mm + amp;
+  }
+  function fmtDur(ms) {
+    if (ms == null || isNaN(ms) || ms < 0) return '—';
+    var s = Math.round(ms / 1000);
+    if (s < 60) return s + 's';
+    var m = Math.floor(s / 60);
+    var r = s % 60;
+    if (m < 60) return m + 'm ' + r + 's';
+    var h = Math.floor(m / 60);
+    return h + 'h ' + (m % 60) + 'm ' + r + 's';
+  }
+  function normStatus(st) {
+    var x = String(st || '').toUpperCase();
+    if (x === 'PASSED' || x === 'FAILED' || x === 'SKIPPED' || x === 'IN_PROGRESS') return x;
+    return 'IN_PROGRESS';
+  }
+  function statusWord(st) {
+    var x = normStatus(st);
+    if (x === 'PASSED') return 'PASS';
+    if (x === 'FAILED') return 'FAIL';
+    if (x === 'SKIPPED') return 'SKIP';
+    return 'RUN';
+  }
+  function statusTagClass(st) {
+    var x = normStatus(st);
+    if (x === 'PASSED') return 'pass';
+    if (x === 'FAILED') return 'fail';
+    if (x === 'SKIPPED') return 'skip';
+    return 'run';
+  }
+  function machineOf(row) {
+    var v = row && (row.executionMachine || row.machine || row.hostname || row.host);
+    if (Array.isArray(v)) v = v[0];
+    return String(v || '').trim();
+  }
+
+  function aggregate(snapshots, onlySuite) {
+    var map = {};
+    var machinesSeen = {};
+    var tagsSeen = {};
+    var totalRuns = 0;
+    var suiteStart = 0;
+    var suiteEnd = 0;
+    var si, j, d, tc, row, name, st, et, stt, m, exp, suiteName, mapKey, folder, htmlFile, testcaseHref, tms, startMs, endMs, mach, reason;
+
+    for (si = 0; si < snapshots.length; si++) {
+      d = snapshots[si];
+      if (!d || !d.testSuite) continue;
+      suiteName = String((d.testSuite && d.testSuite.title) || 'Unnamed suite').trim() || 'Unnamed suite';
+      if (onlySuite && suiteName !== onlySuite) continue;
+      exp = parseTs(d.exportDate);
+      m = exp ? exp.getTime() : 0;
+      tc = d.testSuite.testCases || [];
+      folder = (d && d.__mervFolder) || '';
+      htmlFile = d.running === true ? 'merv-report-live.html' : 'merv-report.html';
+      for (j = 0; j < tc.length; j++) {
+        row = tc[j] || {};
+        name = String(row.testcaseName || 'Unnamed testcase').trim() || 'Unnamed testcase';
+        st = normStatus(row.status);
+        stt = parseTs(row.startTime);
+        et = parseTs(row.endTime) || stt;
+        startMs = stt ? stt.getTime() : 0;
+        endMs = et ? et.getTime() : 0;
+        tms = endMs || startMs || m;
+        mach = machineOf(row);
+        reason = String(row.failureReason || '').trim();
+        testcaseHref = folder ? folder + '/html/' + htmlFile + '?testcase=' + encodeURIComponent(name) : '';
+        mapKey = suiteName + '\u0001' + name;
+        totalRuns++;
+        if (mach) machinesSeen[mach] = 1;
+        if (startMs && (!suiteStart || startMs < suiteStart)) suiteStart = startMs;
+        if (endMs && endMs > suiteEnd) suiteEnd = endMs;
+        if (!map[mapKey]) {
+          map[mapKey] = {
+            name: name,
+            suiteTitle: suiteName,
+            key: 'tc-' + Object.keys(map).length,
+            currentStatus: 'IN_PROGRESS',
+            lastAt: 0,
+            lastPassed: 0,
+            lastFailed: 0,
+            totalPass: 0,
+            totalFail: 0,
+            totalRuns: 0,
+            last5: [],
+            latestHref: '',
+            suiteRuns: [],
+            tags: [],
+            failureReason: '',
+            executionMachine: '',
+            startMs: 0,
+            endMs: 0,
+            durationMs: null,
+          };
+        }
+        map[mapKey].totalRuns++;
+        map[mapKey].last5.push({ t: tms, s: st });
+        map[mapKey].suiteRuns.push({
+          suite: suiteName,
+          folder: folder,
+          status: st,
+          href: testcaseHref,
+          t: tms,
+          when: tms,
+          startMs: startMs,
+          endMs: endMs,
+          durationMs: startMs && endMs && endMs >= startMs ? endMs - startMs : null,
+          machine: mach,
+          failureReason: reason,
+          testcaseName: String(row.testcaseName || name),
+          tags: (row.tags || []).slice(),
+          steps: (row.testSteps || row.steps || []).slice(),
+        });
+        (row.tags || []).forEach(function (tg) {
+          var tx = String(tg || '').trim();
+          if (tx && map[mapKey].tags.indexOf(tx) < 0) map[mapKey].tags.push(tx);
+          if (tx) tagsSeen[tx] = 1;
+        });
+        if (st === 'PASSED') {
+          map[mapKey].totalPass++;
+          if (tms > map[mapKey].lastPassed) map[mapKey].lastPassed = tms;
+        } else if (st === 'FAILED') {
+          map[mapKey].totalFail++;
+          if (tms > map[mapKey].lastFailed) map[mapKey].lastFailed = tms;
+        }
+        if (tms >= map[mapKey].lastAt) {
+          map[mapKey].lastAt = tms;
+          map[mapKey].currentStatus = st;
+          map[mapKey].latestHref = testcaseHref;
+          map[mapKey].failureReason = reason;
+          map[mapKey].executionMachine = mach;
+          map[mapKey].startMs = startMs;
+          map[mapKey].endMs = endMs;
+          map[mapKey].durationMs = startMs && endMs && endMs >= startMs ? endMs - startMs : null;
+        }
+      }
+    }
+
+    suiteMeta = {
+      machines: Object.keys(machinesSeen).sort(),
+      tags: Object.keys(tagsSeen).sort(),
+      totalRuns: totalRuns,
+      startMs: suiteStart,
+      endMs: suiteEnd,
+    };
+
+    return Object.keys(map)
+      .map(function (k) {
+        var r = map[k];
+        r.last5 = (r.last5 || [])
+          .sort(function (a, b) {
+            return b.t - a.t;
+          })
+          .slice(0, 5)
+          .map(function (x) {
+            var s = String(x.s || '').toUpperCase();
+            if (s === 'PASSED') return 'P';
+            if (s === 'FAILED') return 'F';
+            if (s === 'SKIPPED') return 'S';
+            return 'I';
+          })
+          .join(' ');
+        r.suiteRuns = (r.suiteRuns || []).sort(function (a, b) {
+          return b.t - a.t;
+        });
+        return r;
+      })
+      .sort(function (a, b) {
+        return a.name.localeCompare(b.name);
+      });
+  }
+
+  function filteredRows() {
+    return rowsCache.filter(function (r) {
+      var st = normStatus(r.currentStatus).toLowerCase();
+      if (statusFilter === 'passed' && st !== 'passed') return false;
+      if (statusFilter === 'failed' && st !== 'failed') return false;
+      if (statusFilter === 'skipped' && st !== 'skipped') return false;
+      if (searchQ) {
+        var hay = ((r.name || '') + ' ' + (r.tags || []).join(' ') + ' ' + (r.executionMachine || '') + ' ' + (r.failureReason || '')).toLowerCase();
+        if (hay.indexOf(searchQ) < 0) return false;
+      }
+      return true;
+    });
+  }
+
+  function renderSidebar() {
+    if (!listEl) return;
+    var rows = filteredRows();
+    if (!rows.length) {
+      listEl.innerHTML = '<p style="padding:12px;color:#888;font-size:13px;">No matching test cases.</p>';
+      return;
+    }
+    listEl.innerHTML = rows
+      .map(function (r) {
+        var active = selectedKey === r.key ? ' active' : '';
+        var tagCls = statusTagClass(r.currentStatus);
+        var tags = (r.tags || [])
+          .slice(0, 5)
+          .map(function (t) {
+            return '<span class="tag-pill">' + esc(t) + '</span>';
+          })
+          .join('');
+        return (
+          '<div class="sidebar-item' +
+          active +
+          '" data-key="' +
+          esc(r.key) +
+          '">' +
+          '<div class="sidebar-item-top"><span class="sidebar-item-name">' +
+          esc(r.name) +
+          '</span><span class="sidebar-status-tag ' +
+          tagCls +
+          '">' +
+          esc(statusWord(r.currentStatus)) +
+          '</span></div>' +
+          (tags ? '<div class="sidebar-item-tags" style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px;">' + tags + '</div>' : '') +
+          '</div>'
+        );
+      })
+      .join('');
+  }
+
+  function renderFailurePanel() {
+    var panel = document.getElementById('failure-reasons-panel');
+    if (!panel) return;
+    var groups = {};
+    rowsCache.forEach(function (r) {
+      if (normStatus(r.currentStatus) !== 'FAILED') return;
+      var reason = String(r.failureReason || '').trim() || '(No failure message)';
+      if (!groups[reason]) groups[reason] = [];
+      groups[reason].push(r);
+    });
+    var keys = Object.keys(groups).sort(function (a, b) {
+      return groups[b].length - groups[a].length;
+    });
+    var h = '<h3>Failure reasons</h3>';
+    if (!keys.length) {
+      h += '<p class="failure-reason-empty">No current failures.</p>';
+      panel.innerHTML = h;
+      return;
+    }
+    keys.forEach(function (k, idx) {
+      var arr = groups[k];
+      var gid = 'fail-g-' + idx;
+      h += '<div class="failure-reason-group" id="' + gid + '">';
+      h +=
+        '<div class="failure-reason-row" role="button" tabindex="0" data-fail-grp="' +
+        gid +
+        '"><span class="failure-reason-caret" aria-hidden="true">&#9654;</span>';
+      h += '<span class="failure-reason-text">' + esc(k) + '</span>';
+      h += '<span class="failure-reason-count">' + arr.length + '</span></div>';
+      h += '<div class="failure-related-cases">';
+      arr.forEach(function (r) {
+        h +=
+          '<div class="failure-related-case" style="padding:6px 0;cursor:pointer;color:#c20000;font-weight:600;font-size:13px;" data-open-key="' +
+          esc(r.key) +
+          '">' +
+          esc(r.name) +
+          '</div>';
+      });
+      h += '</div></div>';
+    });
+    panel.innerHTML = h;
+  }
+
+  function updateOverview() {
+    var pass = 0,
+      fail = 0,
+      skip = 0,
+      i,
+      st;
+    for (i = 0; i < rowsCache.length; i++) {
+      st = normStatus(rowsCache[i].currentStatus);
+      if (st === 'PASSED') pass++;
+      else if (st === 'FAILED') fail++;
+      else if (st === 'SKIPPED') skip++;
+    }
+    var total = rowsCache.length;
+    var titleEl = document.getElementById('suite-title');
+    if (titleEl) {
+      var textEl = titleEl.querySelector('.suite-title-text');
+      var pillEl = titleEl.querySelector('.status-pill');
+      if (textEl) textEl.textContent = suiteTitle || 'Suite Based Summary';
+      if (pillEl) pillEl.textContent = fail > 0 ? 'FAILED' : 'COMPLETED';
+      if (!textEl) {
+        titleEl.innerHTML =
+          '<span class="suite-title-text">' +
+          esc(suiteTitle || 'Suite Based Summary') +
+          '</span> <span class="status-pill">' +
+          (fail > 0 ? 'FAILED' : 'COMPLETED') +
+          '</span>';
+      }
+    }
+    document.title = (suiteTitle || 'Suite Based Summary') + ' — consolidated';
+    var folderEl = document.getElementById('report-folder');
+    if (folderEl) {
+      folderEl.textContent =
+        'Suite title: ' +
+        (suiteTitle || '—') +
+        ' · Total runs: ' +
+        suiteMeta.totalRuns +
+        (suiteMeta.machines.length ? ' · Machines: ' + suiteMeta.machines.join(', ') : '');
+    }
+    var set = function (id, v) {
+      var el = document.getElementById(id);
+      if (el) el.textContent = v;
+    };
+    set('total-count', String(total));
+    set('passed-count', String(pass));
+    set('failed-count', String(fail));
+    set('skipped-count', String(skip));
+    set('suite-total-runs', String(suiteMeta.totalRuns || 0));
+    set('suite-start', fmtTs(suiteMeta.startMs));
+    set('suite-end', fmtTs(suiteMeta.endMs));
+    set(
+      'suite-duration',
+      suiteMeta.startMs && suiteMeta.endMs && suiteMeta.endMs >= suiteMeta.startMs
+        ? fmtDur(suiteMeta.endMs - suiteMeta.startMs)
+        : '—',
+    );
+    set('suite-machines', suiteMeta.machines.length ? suiteMeta.machines.join(', ') : '—');
+    var tagsEl = document.getElementById('suite-tags');
+    if (tagsEl) {
+      tagsEl.innerHTML = suiteMeta.tags.length
+        ? suiteMeta.tags
+            .map(function (t) {
+              return '<span class="tag-pill">' + esc(t) + '</span>';
+            })
+            .join('')
+        : '<span style="color:#888;font-size:13px;">No tags</span>';
+    }
+    var lp = document.getElementById('leg-p');
+    var lf = document.getElementById('leg-f');
+    var lk = document.getElementById('leg-k');
+    if (lp) lp.textContent = 'Passed (' + pass + ')';
+    if (lf) lf.textContent = 'Failed (' + fail + ')';
+    if (lk) lk.textContent = 'Skipped (' + skip + ')';
+    updatePie(pass, fail, skip);
+    renderFailurePanel();
+  }
+
+  function updatePie(pass, fail, skip) {
+    var canvas = document.getElementById('pieChart');
+    if (!canvas || typeof Chart === 'undefined') return;
+    var data = [pass, fail, skip];
+    if (!pieChart) {
+      pieChart = new Chart(canvas, {
+        type: 'doughnut',
+        data: {
+          labels: ['Passed', 'Failed', 'Skipped'],
+          datasets: [{ data: data, backgroundColor: ['#4caf50', '#f44336', '#ff9800'], borderWidth: 0 }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: { legend: { display: false } },
+          cutout: '55%',
+        },
+      });
+    } else {
+      pieChart.data.datasets[0].data = data;
+      pieChart.update('none');
+    }
+  }
+
+  
+  function normName(s) {
+    return String(s || '').replace(/\s+/g, ' ').trim();
+  }
+  function findCaseInSnap(snap, testcaseName) {
+    var tc = (snap && snap.testSuite && snap.testSuite.testCases) || [];
+    var want = normName(testcaseName);
+    var i, nm, best = null;
+    for (i = 0; i < tc.length; i++) {
+      nm = normName(tc[i].testcaseName);
+      if (nm === want) return tc[i];
+    }
+    // fallback: identical ignoring leading ›/spaces
+    for (i = 0; i < tc.length; i++) {
+      nm = normName(tc[i].testcaseName).replace(/^›\s*/, '');
+      if (nm === want.replace(/^›\s*/, '')) return tc[i];
+    }
+    return best;
+  }
+  function snapForFolder(folder) {
+    if (!folder) return null;
+    if (snapsByFolder[folder]) return snapsByFolder[folder];
+    try {
+      var dec = decodeURIComponent(folder);
+      if (snapsByFolder[dec]) return snapsByFolder[dec];
+    } catch (e) {}
+    try {
+      var enc = encodeURIComponent(folder).replace(/%20/g, '%20');
+      // also try space-encoded form used by index
+      var enc2 = folder.split('/').map(function (p) { return encodeURIComponent(p).replace(/%20/g, '%20'); }).join('/');
+      if (snapsByFolder[enc2]) return snapsByFolder[enc2];
+    } catch (e2) {}
+    var keys = Object.keys(snapsByFolder);
+    for (var k = 0; k < keys.length; k++) {
+      if (decodeUi(keys[k]) === decodeUi(folder) || keys[k] === folder) return snapsByFolder[keys[k]];
+    }
+    return null;
+  }
+
+  function flattenSteps(steps, out) {
+    out = out || [];
+    if (!steps || !steps.length) return out;
+    for (var i = 0; i < steps.length; i++) {
+      var s = steps[i] || {};
+      out.push(s);
+      var kids = s.testSteps || s.steps || s.children || s.childSteps;
+      if (kids && kids.length) flattenSteps(kids, out);
+    }
+    return out;
+  }
+  function renderSteps(steps) {
+    var flat = flattenSteps(steps, []);
+    if (!flat.length) return '<p style="color:#888;font-size:13px;">No steps recorded for this instance.</p>';
+    var h = '<ol class="inst-steps">';
+    flat.forEach(function (s) {
+      var name = s.teststepName || s.stepName || s.name || s.action || s.stepType || 'Step';
+      var st = normStatus(s.status);
+      var det = '';
+      if (s.expected != null || s.actual != null) {
+        det += '<div class="inst-step-ea">Expected: ' + esc(s.expected == null ? '—' : s.expected) + ' · Actual: ' + esc(s.actual == null ? '—' : s.actual) + '</div>';
+      }
+      if (s.testdata != null && s.testdata !== '') {
+        var td = typeof s.testdata === 'string' ? s.testdata : JSON.stringify(s.testdata);
+        det += '<div class="inst-step-ea">Data: ' + esc(String(td).slice(0, 500)) + '</div>';
+      }
+      var msg = s.failureReason || s.errorMessage || s.error || s.message || '';
+      h +=
+        '<li class="inst-step ' +
+        statusTagClass(st) +
+        '"><div class="inst-step-top"><span class="inst-step-name">' +
+        esc(name) +
+        '</span><span class="sidebar-status-tag ' +
+        statusTagClass(st) +
+        '">' +
+        esc(statusWord(st)) +
+        '</span></div>' +
+        det +
+        (msg ? '<div class="inst-fail">' + esc(String(msg).slice(0, 500)) + '</div>' : '') +
+        '</li>';
+    });
+    h += '</ol>';
+    return h;
+  }
+
+  function showInstance(caseRow, idx) {
+    var panel = document.getElementById('case-instance-detail');
+    if (!panel || !caseRow) return;
+    var runs = caseRow.suiteRuns || [];
+    var sr = runs[idx];
+    if (!sr) return;
+    selectedInstIdx = idx;
+    document.querySelectorAll('.inst-row').forEach(function (el) {
+      el.classList.toggle('active', String(el.getAttribute('data-inst-idx')) === String(idx));
+    });
+
+    var snap = snapForFolder(sr.folder);
+    var tc = snap ? findCaseInSnap(snap, sr.testcaseName || caseRow.name) : null;
+    var steps = (sr.steps && sr.steps.length) ? sr.steps : (tc && (tc.testSteps || tc.steps)) || [];
+    // If still empty, try live fetch fallback sync marker
+    var label = 'Instance ' + (idx + 1) + ' — ' + (decodeUi(sr.folder) || 'Run');
+    var htm = '';
+    htm += '<div class="inst-detail-head"><h3 class="case-section-title" style="margin-top:0;">' + esc(label) + ' <span class="status-tag-lg ' + statusTagClass(sr.status) + '">' + esc(statusWord(sr.status)) + '</span></h3>';
+    htm += '<div class="inst-detail-actions">';
+    if (sr.href) {
+      htm += '<a class="suite-open-btn suite-open-btn-lg" href="' + esc(sr.href) + '" target="_blank" rel="noopener noreferrer" title="Videos, screenshots, and full suite report">Open in suite report ↗</a>';
+    }
+    htm += '<button type="button" class="cons-clear-btn" id="close-instance">Close instance</button></div></div>';
+    htm += '<div class="cons-meta-grid">';
+    htm += '<div class="cons-meta-card"><div class="lbl">Folder</div><div class="val">' + esc(decodeUi(sr.folder) || '—') + '</div></div>';
+    htm += '<div class="cons-meta-card"><div class="lbl">Start time</div><div class="val">' + esc(fmtTs(sr.startMs)) + '</div></div>';
+    htm += '<div class="cons-meta-card"><div class="lbl">End time</div><div class="val">' + esc(fmtTs(sr.endMs)) + '</div></div>';
+    htm += '<div class="cons-meta-card"><div class="lbl">Duration</div><div class="val">' + esc(sr.durationMs != null ? fmtDur(sr.durationMs) : '—') + '</div></div>';
+    htm += '<div class="cons-meta-card"><div class="lbl">Executed on</div><div class="val">' + esc(sr.machine || machineOf(tc) || '—') + '</div></div>';
+    htm += '<div class="cons-meta-card"><div class="lbl">Status</div><div class="val"><span class="status-tag-lg ' + statusTagClass(sr.status) + '">' + esc(statusWord(sr.status)) + '</span></div></div>';
+    htm += '<div class="cons-meta-card"><div class="lbl">Steps</div><div class="val">' + steps.length + '</div></div>';
+    htm += '</div>';
+    var tags = (sr.tags && sr.tags.length ? sr.tags : null) || (tc && tc.tags) || caseRow.tags || [];
+    htm += '<div class="cons-case-tags">' + (tags.length ? tags.map(function(t){return '<span class="tag-pill">'+esc(t)+'</span>';}).join('') : '') + '</div>';
+    var reason = sr.failureReason || (tc && String(tc.failureReason || '').trim()) || '';
+    if (normStatus(sr.status) === 'FAILED') {
+      htm += '<div class="fail-box"><div class="lbl">Failure reason</div><pre class="fail-pre">' + esc(reason || '(No failure message)') + '</pre></div>';
+    }
+    var suiteHref = sr.href || '';
+    // Always pin embed to this consolidated case (URL wins over suite sessionStorage).
+    var embedName = String(sr.testcaseName || caseRow.name || '').trim();
+    if (suiteHref) {
+      var baseHref = String(suiteHref).split('#')[0].split('?')[0];
+      var qs = [];
+      if (embedName) qs.push('testcase=' + encodeURIComponent(embedName));
+      qs.push('embed=1');
+      suiteHref = baseHref + '?' + qs.join('&');
+    }
+    htm += '<div class="cons-embed-label">Suite testcase view (steps, screenshots, video)</div>';
+    if (suiteHref) {
+      htm += '<div id="testcase-content" class="cons-embed-wrap">';
+      htm += '<iframe class="cons-suite-iframe" title="Testcase content" src="' + esc(suiteHref) + '" loading="lazy"></iframe>';
+      htm += '</div>';
+    } else {
+      htm += '<h4 class="case-section-title">Test steps (' + steps.length + ')</h4>';
+      htm += renderSteps(steps);
+    }
+    panel.innerHTML = htm;
+    panel.style.display = 'block';
+    var frame = panel.querySelector('iframe.cons-suite-iframe');
+    if (frame) {
+      frame.addEventListener('load', function () {
+        try {
+          var doc = frame.contentDocument || (frame.contentWindow && frame.contentWindow.document);
+          if (!doc) return;
+          doc.documentElement.classList.add('merv-embed-mode');
+          if (!doc.getElementById('merv-embed-inject-style')) {
+            var st = doc.createElement('style');
+            st.id = 'merv-embed-inject-style';
+            st.textContent = 'html.merv-embed-mode .sidebar,html.merv-embed-mode .report-toolbar,html.merv-embed-mode .suite-heading,html.merv-embed-mode .suite-heading-actions,html.merv-embed-mode .live-banner,html.merv-embed-mode .report-folder-meta,html.merv-embed-mode .stats-section,html.merv-embed-mode .merv-share-modal{display:none!important;}html.merv-embed-mode .content-area{margin-left:0!important;padding:12px!important;}html.merv-embed-mode #testcase-content{display:block!important;}';
+            (doc.head || doc.documentElement).appendChild(st);
+          }
+          // grow iframe to content height when possible
+          var hgt = Math.max(480, (doc.getElementById('testcase-content') || doc.body).scrollHeight + 40);
+          frame.style.height = Math.min(hgt, 2400) + 'px';
+        } catch (err) { /* ignore */ }
+      });
+    }
+
+    function wireClose() {
+      var closeBtn = document.getElementById('close-instance');
+      if (closeBtn) {
+        closeBtn.addEventListener('click', function () {
+          selectedInstIdx = -1;
+          panel.style.display = 'none';
+          panel.innerHTML = '';
+          document.querySelectorAll('.inst-row').forEach(function (el) { el.classList.remove('active'); });
+        });
+      }
+    }
+    wireClose();
+
+    // If steps were empty (older cache), fetch this folder JSON once and retry
+    if ((!steps || !steps.length) && sr.folder) {
+      panel.insertAdjacentHTML('beforeend', '<p id="inst-steps-loading" style="color:#888;font-size:13px;">Loading steps…</p>');
+      fetch(String(sr.folder).replace(/^\/?/, '') + '/json/merv-report.json?ts=' + Date.now(), { cache: 'no-store' })
+        .then(function (res) { return res.ok ? res.json() : null; })
+        .then(function (d) {
+          var loading = document.getElementById('inst-steps-loading');
+          if (loading) loading.remove();
+          if (!d) return;
+          d.__mervFolder = sr.folder;
+          snapsByFolder[sr.folder] = d;
+          var found = findCaseInSnap(d, sr.testcaseName || caseRow.name);
+          var fetched = (found && (found.testSteps || found.steps)) || [];
+          if (!fetched.length) return;
+          sr.steps = fetched.slice();
+          // re-render steps section only
+          var title = panel.querySelector('h4.case-section-title');
+          if (title && /Test steps/.test(title.textContent || '')) {
+            title.textContent = 'Test steps (' + fetched.length + ')';
+            var next = title.nextElementSibling;
+            if (next) next.outerHTML = renderSteps(fetched);
+            else title.insertAdjacentHTML('afterend', renderSteps(fetched));
+          }
+          var stepCard = panel.querySelector('.cons-meta-card .lbl');
+          panel.querySelectorAll('.cons-meta-card').forEach(function (card) {
+            var lbl = card.querySelector('.lbl');
+            if (lbl && lbl.textContent === 'Steps') {
+              var val = card.querySelector('.val');
+              if (val) val.textContent = String(fetched.length);
+            }
+          });
+        })
+        .catch(function () {
+          var loading = document.getElementById('inst-steps-loading');
+          if (loading) loading.textContent = 'Could not load steps for this instance.';
+        });
+    }
+
+    panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+function clearDetail() {
+    selectedKey = '';
+    selectedInstIdx = -1;
+    selectedCaseRef = null;
+    if (detailEl) detailEl.classList.remove('active');
+    if (detailEmpty) detailEmpty.style.display = '';
+    var instDetail = document.getElementById('case-instance-detail');
+    if (instDetail) { instDetail.style.display = 'none'; instDetail.innerHTML = ''; }
+    renderSidebar();
+  }
+
+  function showDetail(key) {
+    var r = null;
+    for (var i = 0; i < rowsCache.length; i++) {
+      if (rowsCache[i].key === key) {
+        r = rowsCache[i];
+        break;
+      }
+    }
+    if (!r) return;
+    selectedKey = key;
+    if (detailEmpty) detailEmpty.style.display = 'none';
+    if (detailEl) detailEl.classList.add('active');
+
+    var title = document.getElementById('case-title');
+    if (title) {
+      title.innerHTML =
+        esc(r.name) +
+        ' <span class="status-tag-lg ' +
+        statusTagClass(r.currentStatus) +
+        '">' +
+        esc(statusWord(r.currentStatus)) +
+        '</span>';
+    }
+    var set = function (id, v) {
+      var el = document.getElementById(id);
+      if (el) el.textContent = v;
+    };
+    set('case-total-runs', String(r.totalRuns || 0));
+    set('case-start', fmtTs(r.startMs));
+    set('case-end', fmtTs(r.endMs));
+    set('case-duration', r.durationMs != null ? fmtDur(r.durationMs) : '—');
+    set('case-machine', r.executionMachine || '—');
+    set('case-last5', r.last5 || '—');
+    set('case-pass', String(r.totalPass || 0));
+    set('case-fail', String(r.totalFail || 0));
+    set('case-last-pass', fmtTs(r.lastPassed));
+    set('case-last-fail', fmtTs(r.lastFailed));
+
+    var statusTags = document.getElementById('case-status-tags');
+    if (statusTags) {
+      statusTags.innerHTML =
+        '<span class="status-tag-lg ' +
+        statusTagClass(r.currentStatus) +
+        '">' +
+        esc(statusWord(r.currentStatus)) +
+        '</span>' +
+        '<span class="tag-pill tag-pass">Pass ' +
+        (r.totalPass || 0) +
+        '</span>' +
+        '<span class="tag-pill tag-fail">Fail ' +
+        (r.totalFail || 0) +
+        '</span>' +
+        '<span class="tag-pill">Runs ' +
+        (r.totalRuns || 0) +
+        '</span>';
+    }
+
+    var tagsEl = document.getElementById('case-tags');
+    if (tagsEl) {
+      tagsEl.innerHTML = (r.tags || []).length
+        ? (r.tags || [])
+            .map(function (t) {
+              return '<span class="tag-pill">' + esc(t) + '</span>';
+            })
+            .join('')
+        : '<span style="color:#888;font-size:13px;">No tags</span>';
+    }
+
+    var failBox = document.getElementById('case-failure');
+    if (failBox) {
+      if (normStatus(r.currentStatus) === 'FAILED' && r.failureReason) {
+        failBox.style.display = '';
+        failBox.innerHTML = '<div class="lbl">Current failure reason</div><pre class="fail-pre">' + esc(r.failureReason) + '</pre>';
+      } else if (normStatus(r.currentStatus) === 'FAILED') {
+        failBox.style.display = '';
+        failBox.innerHTML = '<div class="lbl">Current failure reason</div><pre class="fail-pre">(No failure message)</pre>';
+      } else {
+        failBox.style.display = 'none';
+        failBox.innerHTML = '';
+      }
+    }
+
+    var list = document.getElementById('case-instances');
+    selectedCaseRef = r;
+    selectedInstIdx = -1;
+    var instDetail = document.getElementById('case-instance-detail');
+    if (instDetail) {
+      instDetail.style.display = 'none';
+      instDetail.innerHTML = '';
+    }
+    if (list) {
+      var runs = r.suiteRuns || [];
+      if (!runs.length) {
+        list.innerHTML = '<li>No run instances found.</li>';
+      } else {
+        list.innerHTML = runs
+          .map(function (sr, idx) {
+            var label = 'Instance ' + (idx + 1) + ' — ' + (decodeUi(sr.folder) || 'Run ' + (idx + 1));
+            var meta =
+              esc(fmtTs(sr.when || sr.t)) +
+              ' · <span class="sidebar-status-tag ' +
+              statusTagClass(sr.status) +
+              '">' +
+              esc(statusWord(sr.status)) +
+              '</span>' +
+              (sr.durationMs != null ? ' · ' + esc(fmtDur(sr.durationMs)) : '') +
+              (sr.machine ? ' · ' + esc(sr.machine) : '');
+            var failLine =
+              normStatus(sr.status) === 'FAILED' && sr.failureReason
+                ? '<div class="inst-fail">' + esc(String(sr.failureReason).slice(0, 280)) + (sr.failureReason.length > 280 ? '…' : '') + '</div>'
+                : '';
+            return (
+              '<li class="inst-row" data-inst-idx="' +
+              idx +
+              '"><div style="min-width:0;flex:1"><strong>' +
+              esc(label) +
+              '</strong><div style="font-size:12px;color:#666;margin-top:4px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;">' +
+              meta +
+              '</div>' +
+              failLine +
+              '</div>' +
+              '<div class="inst-actions">' +
+              '<button type="button" class="open-btn inst-open-btn" data-inst-idx="' +
+              idx +
+              '">View</button>' +
+              (sr.href
+                ? '<a class="suite-open-btn" href="' +
+                  esc(sr.href) +
+                  '" target="_blank" rel="noopener noreferrer" title="Open in suite report (videos & screenshots)">Suite ↗</a>'
+                : '') +
+              '</div></li>'
+            );
+          })
+          .join('');
+      }
+    }
+
+    var latest = document.getElementById('case-latest-link');
+    if (latest) {
+      latest.style.display = (r.suiteRuns && r.suiteRuns.length) ? 'inline-block' : 'none';
+      latest.removeAttribute('href');
+      latest.setAttribute('role', 'button');
+      latest.textContent = 'View latest instance';
+    }
+    var suiteLatest = document.getElementById('case-suite-link');
+    if (suiteLatest) {
+      var latestRun = (r.suiteRuns && r.suiteRuns[0]) || null;
+      if (latestRun && latestRun.href) {
+        suiteLatest.href = latestRun.href;
+        suiteLatest.style.display = 'inline-block';
+      } else if (r.latestHref) {
+        suiteLatest.href = r.latestHref;
+        suiteLatest.style.display = 'inline-block';
+      } else {
+        suiteLatest.style.display = 'none';
+      }
+    }
+
+    renderSidebar();
+    if (detailEl) detailEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  if (listEl) {
+    listEl.addEventListener('click', function (ev) {
+      var item = ev.target && ev.target.closest ? ev.target.closest('.sidebar-item') : null;
+      if (!item) return;
+      showDetail(item.getAttribute('data-key') || '');
+    });
+  }
+  document.querySelectorAll('.filter-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('.filter-btn').forEach(function (b) {
+        b.classList.remove('active');
+      });
+      btn.classList.add('active');
+      statusFilter = btn.getAttribute('data-status') || 'all';
+      renderSidebar();
+    });
+  });
+  if (searchEl) {
+    searchEl.addEventListener('input', function () {
+      searchQ = String(searchEl.value || '')
+        .toLowerCase()
+        .trim();
+      renderSidebar();
+    });
+  }
+  var clearBtn = document.getElementById('clear-case');
+  if (clearBtn) clearBtn.addEventListener('click', clearDetail);
+
+  var instList = document.getElementById('case-instances');
+  if (instList) {
+    instList.addEventListener('click', function (ev) {
+      var btn = ev.target && ev.target.closest ? ev.target.closest('[data-inst-idx]') : null;
+      if (!btn || !selectedCaseRef) return;
+      var idx = parseInt(btn.getAttribute('data-inst-idx'), 10);
+      if (isNaN(idx)) return;
+      showInstance(selectedCaseRef, idx);
+    });
+  }
+  var latestBtn = document.getElementById('case-latest-link');
+  if (latestBtn) {
+    latestBtn.addEventListener('click', function (ev) {
+      ev.preventDefault();
+      if (!selectedCaseRef || !(selectedCaseRef.suiteRuns || []).length) return;
+      showInstance(selectedCaseRef, 0);
+    });
+  }
+
+
+  var failPanel = document.getElementById('failure-reasons-panel');
+  if (failPanel) {
+    failPanel.addEventListener('click', function (ev) {
+      var row = ev.target && ev.target.closest ? ev.target.closest('.failure-reason-row[data-fail-grp]') : null;
+      if (row) {
+        var g = document.getElementById(row.getAttribute('data-fail-grp') || '');
+        if (g) g.classList.toggle('open');
+        return;
+      }
+      var open = ev.target && ev.target.closest ? ev.target.closest('[data-open-key]') : null;
+      if (open) showDetail(open.getAttribute('data-open-key') || '');
+    });
+  }
+
+  var statTotal = document.getElementById('stat-total');
+  if (statTotal) {
+    statTotal.addEventListener('click', function (ev) {
+      ev.preventDefault();
+      statusFilter = 'all';
+      document.querySelectorAll('.filter-btn').forEach(function (b) {
+        b.classList.toggle('active', (b.getAttribute('data-status') || '') === 'all');
+      });
+      renderSidebar();
+    });
+  }
+
+  async function load() {
+    if (!suiteTitle) {
+      if (listEl) listEl.innerHTML = '<p style="padding:12px;color:#888;">Missing suite title.</p>';
+      return;
+    }
+    var folders = [];
+    try {
+      var man = await fetch('./merv-index-data.json?ts=' + Date.now(), { cache: 'no-store' });
+      if (man.ok) {
+        var data = await man.json();
+        folders = (data.folders || data.entries || [])
+          .map(function (x) {
+            return typeof x === 'string' ? x : x.encodedFolderName || '';
+          })
+          .filter(Boolean);
+      }
+    } catch (e) {}
+    if (!folders.length) {
+      if (listEl) listEl.innerHTML = '<p style="padding:12px;color:#888;">Could not load report folders.</p>';
+      return;
+    }
+    var snaps = [];
+    for (var i = 0; i < folders.length; i++) {
+      try {
+        var r = await fetch(folders[i] + '/json/merv-report.json?ts=' + Date.now(), { cache: 'no-store' });
+        if (!r.ok) continue;
+        var d = await r.json();
+        d.__mervFolder = folders[i];
+        snapsByFolder[folders[i]] = d;
+        snaps.push(d);
+      } catch (err) {}
+    }
+    rowsCache = aggregate(snaps, suiteTitle);
+    updateOverview();
+    clearDetail();
+  }
+
+  load();
+})();
+
+
+</script>
+</body>
+</html>

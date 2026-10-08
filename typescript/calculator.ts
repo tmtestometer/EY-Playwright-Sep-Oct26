@@ -1,13 +1,9 @@
-
-
 interface Calculator{
     add(a : number, b:number) : number;
 }
-
 interface ScienticCalculator extends Calculator{
 
 }  
-
 interface Payment{
     transactionId: number, 
     currency : string
@@ -17,29 +13,24 @@ interface PaymentAction{
     performSwiftPayment(payment: Payment): boolean;
 }
 
-
 class USPayment implements PaymentAction{
     performSwiftPayment(payment: Payment): boolean {
         // code to process switch in US region
         return true
     }
 }
-
 class UKPayment implements PaymentAction{
     performSwiftPayment(payment: Payment): boolean {
         // code to process switch in UK region
         return true
     }
 }
-
 class AsiaPayment implements PaymentAction{
     performSwiftPayment(payment: Payment): boolean {
         // code to process switch in Asia region
         return true
     }
 }
-
-
 let payment1 :Payment= {
     transactionId: 1768678684, 
     currency : "USD"

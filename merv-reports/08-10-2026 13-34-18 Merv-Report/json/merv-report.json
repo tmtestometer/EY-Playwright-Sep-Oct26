@@ -1,0 +1,526 @@
+{
+  "version": "1.0",
+  "running": false,
+  "lastActivityMillis": 1791446690695,
+  "exportDate": "Thu Oct 08 2026 13:34:50 GMT+0530 (India Standard Time)",
+  "testSuite": {
+    "title": "ey-sep29-batch",
+    "startTime": "2026-10-08T08:04:18.535Z",
+    "endTime": "2026-10-08T08:04:50.695Z",
+    "testCases": [
+      {
+        "testcaseName": " › chromium › dashboard.spec.js › verify user able to login1 dashboard",
+        "status": "PASSED",
+        "failureReason": null,
+        "tags": [
+          "chromium"
+        ],
+        "startTime": "2026-10-08T08:04:18.938Z",
+        "endTime": "2026-10-08T08:04:20.017Z",
+        "executionMachine": "Vaibhavs-Laptop.local",
+        "testSteps": [
+          {
+            "teststepName": "Navigate",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "PASSED",
+            "startTime": "2026-10-08T08:04:19.602Z",
+            "endTime": "2026-10-08T08:04:19.991Z",
+            "errorMessage": null,
+            "screenshots": []
+          },
+          {
+            "teststepName": "Click",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "PASSED",
+            "startTime": "2026-10-08T08:04:20.001Z",
+            "endTime": "2026-10-08T08:04:20.217Z",
+            "errorMessage": null,
+            "screenshots": []
+          },
+          {
+            "teststepName": "Fill \"standard_user\"",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "PASSED",
+            "startTime": "2026-10-08T08:04:20.219Z",
+            "endTime": "2026-10-08T08:04:20.227Z",
+            "errorMessage": null,
+            "screenshots": []
+          },
+          {
+            "teststepName": "Click",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "PASSED",
+            "startTime": "2026-10-08T08:04:20.229Z",
+            "endTime": "2026-10-08T08:04:20.273Z",
+            "errorMessage": null,
+            "screenshots": []
+          },
+          {
+            "teststepName": "Fill \"secret_sauce\"",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "PASSED",
+            "startTime": "2026-10-08T08:04:20.274Z",
+            "endTime": "2026-10-08T08:04:20.281Z",
+            "errorMessage": null,
+            "screenshots": []
+          },
+          {
+            "teststepName": "Click",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "PASSED",
+            "startTime": "2026-10-08T08:04:20.283Z",
+            "endTime": "2026-10-08T08:04:20.327Z",
+            "errorMessage": null,
+            "screenshots": []
+          }
+        ]
+      },
+      {
+        "testcaseName": " › chromium › dashboard.spec.js › verify user able to login2 dashboard",
+        "status": "PASSED",
+        "failureReason": null,
+        "tags": [
+          "chromium"
+        ],
+        "startTime": "2026-10-08T08:04:18.944Z",
+        "endTime": "2026-10-08T08:04:20.024Z",
+        "executionMachine": "Vaibhavs-Laptop.local",
+        "testSteps": [
+          {
+            "teststepName": "Navigate",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "PASSED",
+            "startTime": "2026-10-08T08:04:19.602Z",
+            "endTime": "2026-10-08T08:04:19.990Z",
+            "errorMessage": null,
+            "screenshots": []
+          },
+          {
+            "teststepName": "Click",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "PASSED",
+            "startTime": "2026-10-08T08:04:19.995Z",
+            "endTime": "2026-10-08T08:04:20.208Z",
+            "errorMessage": null,
+            "screenshots": []
+          },
+          {
+            "teststepName": "Fill \"standard_user\"",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "PASSED",
+            "startTime": "2026-10-08T08:04:20.210Z",
+            "endTime": "2026-10-08T08:04:20.225Z",
+            "errorMessage": null,
+            "screenshots": []
+          },
+          {
+            "teststepName": "Click",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "PASSED",
+            "startTime": "2026-10-08T08:04:20.228Z",
+            "endTime": "2026-10-08T08:04:20.273Z",
+            "errorMessage": null,
+            "screenshots": []
+          },
+          {
+            "teststepName": "Fill \"secret_sauce\"",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "PASSED",
+            "startTime": "2026-10-08T08:04:20.274Z",
+            "endTime": "2026-10-08T08:04:20.281Z",
+            "errorMessage": null,
+            "screenshots": []
+          },
+          {
+            "teststepName": "Click",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "PASSED",
+            "startTime": "2026-10-08T08:04:20.282Z",
+            "endTime": "2026-10-08T08:04:20.327Z",
+            "errorMessage": null,
+            "screenshots": []
+          }
+        ]
+      },
+      {
+        "testcaseName": " › chromium › dashboard.spec.js › verify user able to login dashboard",
+        "status": "PASSED",
+        "failureReason": null,
+        "tags": [
+          "chromium"
+        ],
+        "startTime": "2026-10-08T08:04:18.957Z",
+        "endTime": "2026-10-08T08:04:20.035Z",
+        "executionMachine": "Vaibhavs-Laptop.local",
+        "testSteps": [
+          {
+            "teststepName": "Navigate",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "PASSED",
+            "startTime": "2026-10-08T08:04:19.603Z",
+            "endTime": "2026-10-08T08:04:19.991Z",
+            "errorMessage": null,
+            "screenshots": []
+          },
+          {
+            "teststepName": "Click",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "PASSED",
+            "startTime": "2026-10-08T08:04:19.998Z",
+            "endTime": "2026-10-08T08:04:20.207Z",
+            "errorMessage": null,
+            "screenshots": []
+          },
+          {
+            "teststepName": "Fill \"standard_user\"",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "PASSED",
+            "startTime": "2026-10-08T08:04:20.210Z",
+            "endTime": "2026-10-08T08:04:20.230Z",
+            "errorMessage": null,
+            "screenshots": []
+          },
+          {
+            "teststepName": "Click",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "PASSED",
+            "startTime": "2026-10-08T08:04:20.233Z",
+            "endTime": "2026-10-08T08:04:20.276Z",
+            "errorMessage": null,
+            "screenshots": []
+          },
+          {
+            "teststepName": "Fill \"secret_sauce\"",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "PASSED",
+            "startTime": "2026-10-08T08:04:20.279Z",
+            "endTime": "2026-10-08T08:04:20.286Z",
+            "errorMessage": null,
+            "screenshots": []
+          },
+          {
+            "teststepName": "Click",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "PASSED",
+            "startTime": "2026-10-08T08:04:20.288Z",
+            "endTime": "2026-10-08T08:04:20.327Z",
+            "errorMessage": null,
+            "screenshots": []
+          }
+        ]
+      },
+      {
+        "testcaseName": " › chromium › api.spec.js › post api @smoke",
+        "status": "PASSED",
+        "failureReason": null,
+        "tags": [
+          "chromium",
+          "@smoke"
+        ],
+        "startTime": "2026-10-08T08:04:18.959Z",
+        "endTime": "2026-10-08T08:04:19.717Z",
+        "executionMachine": "Vaibhavs-Laptop.local",
+        "testSteps": [
+          {
+            "teststepName": "POST",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "PASSED",
+            "startTime": "2026-10-08T08:04:19.013Z",
+            "endTime": "2026-10-08T08:04:19.731Z",
+            "errorMessage": null,
+            "screenshots": []
+          },
+          {
+            "teststepName": "Expect \"soft toBe\"",
+            "stepType": "EXPECT",
+            "status": "PASSED",
+            "startTime": "2026-10-08T08:04:19.741Z",
+            "endTime": "2026-10-08T08:04:19.741Z",
+            "errorMessage": null,
+            "screenshots": []
+          }
+        ]
+      },
+      {
+        "testcaseName": " › chromium › api.spec.js › put api @smoke",
+        "status": "PASSED",
+        "failureReason": null,
+        "tags": [
+          "chromium",
+          "@smoke"
+        ],
+        "startTime": "2026-10-08T08:04:19.775Z",
+        "endTime": "2026-10-08T08:04:20.470Z",
+        "executionMachine": "Vaibhavs-Laptop.local",
+        "testSteps": [
+          {
+            "teststepName": "PUT",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "PASSED",
+            "startTime": "2026-10-08T08:04:19.831Z",
+            "endTime": "2026-10-08T08:04:20.484Z",
+            "errorMessage": null,
+            "screenshots": []
+          },
+          {
+            "teststepName": "Expect \"soft toBe\"",
+            "stepType": "EXPECT",
+            "status": "PASSED",
+            "startTime": "2026-10-08T08:04:20.485Z",
+            "endTime": "2026-10-08T08:04:20.485Z",
+            "errorMessage": null,
+            "screenshots": []
+          }
+        ]
+      },
+      {
+        "testcaseName": " › chromium › login.spec.js › verify error message for empty credentials",
+        "status": "FAILED",
+        "failureReason": "Script failure: ReferenceError: loginPageObject is not defined\n    at /Users/vaibhavsingh/Desktop/teche-apps/EY-Playwright-Sep-Oct26/tests/login.spec.js:10:20\n\n8 |   test(`${data.testname}`,  async ({ browser, context, page }) => {\n   9 |\n> 10 |     loginPageObject = new LoginPage(page);\n     |                    ^\n  11 |     await page.goto('https://www.saucedemo.com/'); // 200 ms\n  12 |     await loginPageObject.performLogin(data.username, data.password);\n  13 |     let actualErrorMsg = await loginPageObject.getErrorMsg();",
+        "tags": [
+          "chromium"
+        ],
+        "startTime": "2026-10-08T08:04:20.450Z",
+        "endTime": "2026-10-08T08:04:20.577Z",
+        "executionMachine": "Vaibhavs-Laptop.local",
+        "testSteps": [
+          {
+            "teststepName": "Script failure",
+            "stepType": "ASSERTION",
+            "status": "FAILED",
+            "errorMessage": "ReferenceError: loginPageObject is not defined\n    at /Users/vaibhavsingh/Desktop/teche-apps/EY-Playwright-Sep-Oct26/tests/login.spec.js:10:20\n\n8 |   test(`${data.testname}`,  async ({ browser, context, page }) => {\n   9 |\n> 10 |     loginPageObject = new LoginPage(page);\n     |                    ^\n  11 |     await page.goto('https://www.saucedemo.com/'); // 200 ms\n  12 |     await loginPageObject.performLogin(data.username, data.password);\n  13 |     let actualErrorMsg = await loginPageObject.getErrorMsg();",
+            "actual": "ReferenceError: loginPageObject is not defined\n    at /Users/vaibhavsingh/Desktop/teche-apps/EY-Playwright-Sep-Oct26/tests/login.spec.js:10:20\n\n8 |   test(`${data.testname}`,  async ({ browser, context, page }) => {\n   9 |\n> 10 |     loginPageObject = new LoginPage(page);\n     |                    ^\n  11 |     await page.goto('https://www.saucedemo.com/'); // 200 ms\n  12 |     await loginPageObject.performLogin(data.username, data.password);\n  13 |     let actualErrorMsg = await loginPageObject.getErrorMsg();",
+            "startTime": "2026-10-08T08:04:20.450Z",
+            "endTime": "2026-10-08T08:04:20.577Z"
+          }
+        ]
+      },
+      {
+        "testcaseName": " › chromium › myfile.spec.js › testcase 1",
+        "status": "FAILED",
+        "failureReason": "Wait for function: Error: page.waitForFunction: Test timeout of 30000ms exceeded.\n    at /Users/vaibhavsingh/Desktop/teche-apps/EY-Playwright-Sep-Oct26/tests/myfile.spec.js:28:16\n\n26 |     await test1Tab.waitForLoadState(\"load\", {timeout: 50000});\n  27 |     \n> 28 | await test1Tab.waitForFunction(() => {\n     |                ^\n  29 |     window.appReady === true , {timeout: 30000 }\n  30 | })\n  31 |\n\nTest timeout of 30000ms exceeded.\n\nError: page.waitForFunction: Test timeout of 30000ms exceeded.\n    at /Users/vaibhavsingh/Desktop/teche-apps/EY-Playwright-Sep-Oct26/tests/myfile.spec.js:28:16\n\n26 |     await test1Tab.waitForLoadState(\"load\", {timeout: 50000});\n  27 |     \n> 28 | await test1Tab.waitForFunction(() => {\n     |                ^\n  29 |     window.appReady === true , {timeout: 30000 }\n  30 | })\n  31 |",
+        "tags": [
+          "chromium"
+        ],
+        "startTime": "2026-10-08T08:04:20.451Z",
+        "endTime": "2026-10-08T08:04:50.590Z",
+        "executionMachine": "Vaibhavs-Laptop.local",
+        "testSteps": [
+          {
+            "teststepName": "Navigate",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "PASSED",
+            "startTime": "2026-10-08T08:04:20.525Z",
+            "endTime": "2026-10-08T08:04:20.563Z",
+            "errorMessage": null,
+            "screenshots": []
+          },
+          {
+            "teststepName": "Wait for event \"popup\"",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "PASSED",
+            "startTime": "2026-10-08T08:04:20.563Z",
+            "endTime": "2026-10-08T08:04:20.703Z",
+            "errorMessage": null,
+            "screenshots": []
+          },
+          {
+            "teststepName": "Click",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "PASSED",
+            "startTime": "2026-10-08T08:04:20.564Z",
+            "endTime": "2026-10-08T08:04:20.623Z",
+            "errorMessage": null,
+            "screenshots": []
+          },
+          {
+            "teststepName": "Wait for load state \"load\"",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "PASSED",
+            "startTime": "2026-10-08T08:04:20.716Z",
+            "endTime": "2026-10-08T08:04:20.718Z",
+            "errorMessage": null,
+            "screenshots": []
+          },
+          {
+            "teststepName": "Wait for function",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "FAILED",
+            "startTime": "2026-10-08T08:04:20.718Z",
+            "endTime": "2026-10-08T08:04:50.605Z",
+            "errorMessage": "Error: page.waitForFunction: Test timeout of 30000ms exceeded.\n    at /Users/vaibhavsingh/Desktop/teche-apps/EY-Playwright-Sep-Oct26/tests/myfile.spec.js:28:16\n\n26 |     await test1Tab.waitForLoadState(\"load\", {timeout: 50000});\n  27 |     \n> 28 | await test1Tab.waitForFunction(() => {\n     |                ^\n  29 |     window.appReady === true , {timeout: 30000 }\n  30 | })\n  31 |",
+            "screenshots": [
+              "screenshots/728aadc4d766ccce3545-837ad0265928d18323e5-att0.png",
+              "screenshots/728aadc4d766ccce3545-837ad0265928d18323e5-att1.png"
+            ]
+          }
+        ]
+      },
+      {
+        "testcaseName": " › chromium › payment.spec.js › verify user able to login payment",
+        "status": "FAILED",
+        "failureReason": "Script failure: ReferenceError: loginPageObject is not defined\n    at /Users/vaibhavsingh/Desktop/teche-apps/EY-Playwright-Sep-Oct26/tests/payment.spec.js:7:17\n\n5 | test('verify user able to login payment', async ({ page }) => {\n   6 |   await page.goto('https://www.saucedemo.com/');\n>  7 |  loginPageObject = new LoginPage(page);\n     |                 ^\n   8 |  loginPageObject.performLogin(\"standard_user\", \"secret_sauce\");\n   9 |\n  10 | });",
+        "tags": [
+          "chromium"
+        ],
+        "startTime": "2026-10-08T08:04:20.459Z",
+        "endTime": "2026-10-08T08:04:20.878Z",
+        "executionMachine": "Vaibhavs-Laptop.local",
+        "testSteps": [
+          {
+            "teststepName": "Navigate",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "PASSED",
+            "startTime": "2026-10-08T08:04:20.533Z",
+            "endTime": "2026-10-08T08:04:20.775Z",
+            "errorMessage": null,
+            "screenshots": []
+          },
+          {
+            "teststepName": "Script failure",
+            "stepType": "ASSERTION",
+            "status": "FAILED",
+            "errorMessage": "ReferenceError: loginPageObject is not defined\n    at /Users/vaibhavsingh/Desktop/teche-apps/EY-Playwright-Sep-Oct26/tests/payment.spec.js:7:17\n\n5 | test('verify user able to login payment', async ({ page }) => {\n   6 |   await page.goto('https://www.saucedemo.com/');\n>  7 |  loginPageObject = new LoginPage(page);\n     |                 ^\n   8 |  loginPageObject.performLogin(\"standard_user\", \"secret_sauce\");\n   9 |\n  10 | });",
+            "actual": "ReferenceError: loginPageObject is not defined\n    at /Users/vaibhavsingh/Desktop/teche-apps/EY-Playwright-Sep-Oct26/tests/payment.spec.js:7:17\n\n5 | test('verify user able to login payment', async ({ page }) => {\n   6 |   await page.goto('https://www.saucedemo.com/');\n>  7 |  loginPageObject = new LoginPage(page);\n     |                 ^\n   8 |  loginPageObject.performLogin(\"standard_user\", \"secret_sauce\");\n   9 |\n  10 | });",
+            "startTime": "2026-10-08T08:04:20.459Z",
+            "endTime": "2026-10-08T08:04:20.878Z"
+          }
+        ]
+      },
+      {
+        "testcaseName": " › chromium › payment.spec.js › verify user able to login1 payment",
+        "status": "PASSED",
+        "failureReason": null,
+        "tags": [
+          "chromium"
+        ],
+        "startTime": "2026-10-08T08:04:20.537Z",
+        "endTime": "2026-10-08T08:04:21.120Z",
+        "executionMachine": "Vaibhavs-Laptop.local",
+        "testSteps": [
+          {
+            "teststepName": "Navigate",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "PASSED",
+            "startTime": "2026-10-08T08:04:20.812Z",
+            "endTime": "2026-10-08T08:04:21.031Z",
+            "errorMessage": null,
+            "screenshots": []
+          },
+          {
+            "teststepName": "Click",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "PASSED",
+            "startTime": "2026-10-08T08:04:21.035Z",
+            "endTime": "2026-10-08T08:04:21.114Z",
+            "errorMessage": null,
+            "screenshots": []
+          },
+          {
+            "teststepName": "Fill \"standard_user\"",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "PASSED",
+            "startTime": "2026-10-08T08:04:21.115Z",
+            "endTime": "2026-10-08T08:04:21.122Z",
+            "errorMessage": null,
+            "screenshots": []
+          },
+          {
+            "teststepName": "Double click",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "PASSED",
+            "startTime": "2026-10-08T08:04:21.122Z",
+            "endTime": "2026-10-08T08:04:21.178Z",
+            "errorMessage": null,
+            "screenshots": []
+          },
+          {
+            "teststepName": "Fill \"secret_sauce\"",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "PASSED",
+            "startTime": "2026-10-08T08:04:21.179Z",
+            "endTime": "2026-10-08T08:04:21.184Z",
+            "errorMessage": null,
+            "screenshots": []
+          },
+          {
+            "teststepName": "Click",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "PASSED",
+            "startTime": "2026-10-08T08:04:21.185Z",
+            "endTime": "2026-10-08T08:04:21.234Z",
+            "errorMessage": null,
+            "screenshots": []
+          }
+        ]
+      },
+      {
+        "testcaseName": " › chromium › payment.spec.js › verify user able to login2 payment",
+        "status": "PASSED",
+        "failureReason": null,
+        "tags": [
+          "chromium"
+        ],
+        "startTime": "2026-10-08T08:04:21.081Z",
+        "endTime": "2026-10-08T08:04:21.614Z",
+        "executionMachine": "Vaibhavs-Laptop.local",
+        "testSteps": [
+          {
+            "teststepName": "Navigate",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "PASSED",
+            "startTime": "2026-10-08T08:04:21.307Z",
+            "endTime": "2026-10-08T08:04:21.523Z",
+            "errorMessage": null,
+            "screenshots": []
+          },
+          {
+            "teststepName": "Click",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "PASSED",
+            "startTime": "2026-10-08T08:04:21.526Z",
+            "endTime": "2026-10-08T08:04:21.591Z",
+            "errorMessage": null,
+            "screenshots": []
+          },
+          {
+            "teststepName": "Fill \"standard_user\"",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "PASSED",
+            "startTime": "2026-10-08T08:04:21.591Z",
+            "endTime": "2026-10-08T08:04:21.596Z",
+            "errorMessage": null,
+            "screenshots": []
+          },
+          {
+            "teststepName": "Click",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "PASSED",
+            "startTime": "2026-10-08T08:04:21.598Z",
+            "endTime": "2026-10-08T08:04:21.666Z",
+            "errorMessage": null,
+            "screenshots": []
+          },
+          {
+            "teststepName": "Fill \"secret_sauce\"",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "PASSED",
+            "startTime": "2026-10-08T08:04:21.667Z",
+            "endTime": "2026-10-08T08:04:21.670Z",
+            "errorMessage": null,
+            "screenshots": []
+          },
+          {
+            "teststepName": "Click",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "PASSED",
+            "startTime": "2026-10-08T08:04:21.671Z",
+            "endTime": "2026-10-08T08:04:21.701Z",
+            "errorMessage": null,
+            "screenshots": []
+          }
+        ]
+      }
+    ]
+  }
+}

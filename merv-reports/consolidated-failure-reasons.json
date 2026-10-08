@@ -1,0 +1,38 @@
+{
+  "generatedAtMillis": 1791446800762,
+  "failureReasons": [
+    {
+      "reason": "Script failure: ReferenceError: loginPageObject is not defined\n\n8 |   test(`${data.testname}`,  async ({ browser, context, page }) => {\n   9 |\n> 10 |     loginPageObject = new LoginPage(page);\n     |                    ^\n  11 |     await page.goto('https://www.saucedemo.com/'); // 200 ms\n  12 |     await loginPageObject.performLogin(data.username, data.password);\n  13 |     let actualErrorMsg = await loginPageObject.getErrorMsg();",
+      "count": 1,
+      "testcases": [
+        {
+          "testcaseName": "› chromium › login.spec.js › verify error message for empty credentials",
+          "runFolder": "08-10-2026 13-36-08 Merv-Report",
+          "runTimestampMillis": 1791446800757.5916
+        }
+      ]
+    },
+    {
+      "reason": "Wait for function: Error: page.waitForFunction: Test timeout of 30000ms exceeded.\n\n26 |     await test1Tab.waitForLoadState(\"load\", {timeout: 50000});\n  27 |     \n> 28 | await test1Tab.waitForFunction(() => {\n     |                ^\n  29 |     window.appReady === true , {timeout: 30000 }\n  30 | })\n  31 |\n\nTest timeout of 30000ms exceeded.\n\nError: page.waitForFunction: Test timeout of 30000ms exceeded.\n\n26 |     await test1Tab.waitForLoadState(\"load\", {timeout: 50000});\n  27 |     \n> 28 | await test1Tab.waitForFunction(() => {\n     |                ^\n  29 |     window.appReady === true , {timeout: 30000 }\n  30 | })\n  31 |",
+      "count": 1,
+      "testcases": [
+        {
+          "testcaseName": "› chromium › myfile.spec.js › testcase 1",
+          "runFolder": "08-10-2026 13-36-08 Merv-Report",
+          "runTimestampMillis": 1791446800757.5916
+        }
+      ]
+    },
+    {
+      "reason": "Script failure: ReferenceError: loginPageObject is not defined\n\n5 | test('verify user able to login payment', async ({ page }) => {\n   6 |   await page.goto('https://www.saucedemo.com/');\n>  7 |  loginPageObject = new LoginPage(page);\n     |                 ^\n   8 |  loginPageObject.performLogin(\"standard_user\", \"secret_sauce\");\n   9 |\n  10 | });",
+      "count": 1,
+      "testcases": [
+        {
+          "testcaseName": "› chromium › payment.spec.js › verify user able to login payment",
+          "runFolder": "08-10-2026 13-36-08 Merv-Report",
+          "runTimestampMillis": 1791446800757.5916
+        }
+      ]
+    }
+  ]
+}

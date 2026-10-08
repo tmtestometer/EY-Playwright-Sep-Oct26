@@ -1,0 +1,45 @@
+{
+  "version": "1.0",
+  "exportDate": "Thu Oct 08 2026 13:34:50 GMT+0530 (India Standard Time)",
+  "suiteTitle": "ey-sep29-batch",
+  "running": false,
+  "failureCount": 3,
+  "failures": [
+    {
+      "testcaseName": "› chromium › login.spec.js › verify error message for empty credentials",
+      "status": "FAILED",
+      "failureReason": "Script failure: ReferenceError: loginPageObject is not defined\n    at /Users/vaibhavsingh/Desktop/teche-apps/EY-Playwright-Sep-Oct26/tests/login.spec.js:10:20\n\n8 |   test(`${data.testname}`,  async ({ browser, context, page }) => {\n   9 |\n> 10 |     loginPageObject = new LoginPage(page);\n     |                    ^\n  11 |     await page.goto('https://www.saucedemo.com/'); // 200 ms\n  12 |     await loginPageObject.performLogin(data.username, data.password);\n  13 |     let actualErrorMsg = await loginPageObject.getErrorMsg();",
+      "tags": [
+        "chromium"
+      ],
+      "startTime": "2026-10-08T08:04:20.450Z",
+      "endTime": "2026-10-08T08:04:20.577Z",
+      "executionMachine": "Vaibhavs-Laptop.local",
+      "testdataSteps": []
+    },
+    {
+      "testcaseName": "› chromium › myfile.spec.js › testcase 1",
+      "status": "FAILED",
+      "failureReason": "Wait for function: Error: page.waitForFunction: Test timeout of 30000ms exceeded.\n    at /Users/vaibhavsingh/Desktop/teche-apps/EY-Playwright-Sep-Oct26/tests/myfile.spec.js:28:16\n\n26 |     await test1Tab.waitForLoadState(\"load\", {timeout: 50000});\n  27 |     \n> 28 | await test1Tab.waitForFunction(() => {\n     |                ^\n  29 |     window.appReady === true , {timeout: 30000 }\n  30 | })\n  31 |\n\nTest timeout of 30000ms exceeded.\n\nError: page.waitForFunction: Test timeout of 30000ms exceeded.\n    at /Users/vaibhavsingh/Desktop/teche-apps/EY-Playwright-Sep-Oct26/tests/myfile.spec.js:28:16\n\n26 |     await test1Tab.waitForLoadState(\"load\", {timeout: 50000});\n  27 |     \n> 28 | await test1Tab.waitForFunction(() => {\n     |                ^\n  29 |     window.appReady === true , {timeout: 30000 }\n  30 | })\n  31 |",
+      "tags": [
+        "chromium"
+      ],
+      "startTime": "2026-10-08T08:04:20.451Z",
+      "endTime": "2026-10-08T08:04:50.590Z",
+      "executionMachine": "Vaibhavs-Laptop.local",
+      "testdataSteps": []
+    },
+    {
+      "testcaseName": "› chromium › payment.spec.js › verify user able to login payment",
+      "status": "FAILED",
+      "failureReason": "Script failure: ReferenceError: loginPageObject is not defined\n    at /Users/vaibhavsingh/Desktop/teche-apps/EY-Playwright-Sep-Oct26/tests/payment.spec.js:7:17\n\n5 | test('verify user able to login payment', async ({ page }) => {\n   6 |   await page.goto('https://www.saucedemo.com/');\n>  7 |  loginPageObject = new LoginPage(page);\n     |                 ^\n   8 |  loginPageObject.performLogin(\"standard_user\", \"secret_sauce\");\n   9 |\n  10 | });",
+      "tags": [
+        "chromium"
+      ],
+      "startTime": "2026-10-08T08:04:20.459Z",
+      "endTime": "2026-10-08T08:04:20.878Z",
+      "executionMachine": "Vaibhavs-Laptop.local",
+      "testdataSteps": []
+    }
+  ]
+}
