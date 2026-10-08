@@ -6,10 +6,18 @@
   "author": "",
   "type": "module",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "myframework" : "npx playwright test",
+    "qa:smoke" : "npx cucumber-js --tags '@smoke'",
+    "qa:sanity" : "npx cucumber-js --tags '@smoke'",
+    "qa:full" : "npx cucumber-js --tags '@smoke and @sanity'",
+    "typecheck" : "npx tsx typescript/first.ts --ignoreConfig"
+  },
   "dependencies": {
     "@cucumber/cucumber": "^13.3.0",
-    "playwright": "^1.63.0"
+    "playwright": "^1.63.0",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0",
