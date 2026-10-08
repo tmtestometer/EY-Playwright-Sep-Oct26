@@ -11,7 +11,8 @@
     "qa:smoke" : "npx cucumber-js --tags '@smoke'",
     "qa:sanity" : "npx cucumber-js --tags '@smoke'",
     "qa:full" : "npx cucumber-js --tags '@smoke and @sanity'",
-    "typecheck" : "npx tsx typescript/first.ts --ignoreConfig"
+    "typecheck" : "npx tsc typescript/first.ts --ignoreConfig",
+    "runcheck" : "npx tsx typescript/first.ts --ignoreConfig"
   },
   "dependencies": {
     "@cucumber/cucumber": "^13.3.0",
