@@ -40,15 +40,10 @@
 
 // //unknown (perform typechecking and then perfomr that operation) and any (dont perform type check before any oprtation)
 
-
-
-
 // let a : any = "vaibhav";
 // a = 10;
 // a = true;
 // console.log(a.toUpperCase()); // error
-
-
 
 // let b : unknown = "vaibhav";
 // b = 10;
@@ -57,9 +52,6 @@
 //     console.log(b.toUpperCase()); // error
 // }
 
-
-
-
 // interface - json template
 
 interface Employee {
@@ -67,6 +59,11 @@ interface Employee {
     readonly name : string;  // readonly but mandatory
     salary ?: number;   // optional 
 }
+
+
+
+
+
 
 const emp1 : Employee = {
     id: 101,
@@ -78,9 +75,7 @@ emp1.salary= 13000;
 //emp1.id = 103
 //emp1.name = "Pooja";
 //emp1.id = 102;
-
 console.log(emp1);
-
 
 function add(a:number, b:number) : number{
     let c = a + b
