@@ -24,7 +24,7 @@ test('credentialSetup @credentialSetup', async ({ page }) => {
                 ]
             })
         });
-  })  
+  })
   await page.goto('https://demoqa.com/books');
   await page.waitForTimeout(5000);
 
