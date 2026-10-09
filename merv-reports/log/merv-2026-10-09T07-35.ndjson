@@ -1,0 +1,12 @@
+{"ts":"2026-10-09T07:38:51.395Z","level":"INFO","name":"Merv","msg":"Suite started — ey-sep29-batch-demo","suite":"ey-sep29-batch-demo"}
+{"ts":"2026-10-09T07:38:53.131Z","level":"INFO","name":"Merv","msg":"Before Hooks › Fixture \"browser\" › Launch browser","suite":"ey-sep29-batch-demo","testcase":"› chromium › payment.spec.js › verify user able to login1 payment"}
+{"ts":"2026-10-09T07:38:53.165Z","level":"INFO","name":"Merv","msg":"Before Hooks › Fixture \"context\" › Create context","suite":"ey-sep29-batch-demo","testcase":"› chromium › payment.spec.js › verify user able to login1 payment"}
+{"ts":"2026-10-09T07:38:53.450Z","level":"INFO","name":"Merv","msg":"Before Hooks › Fixture \"page\" › Create page","suite":"ey-sep29-batch-demo","testcase":"› chromium › payment.spec.js › verify user able to login1 payment"}
+{"ts":"2026-10-09T07:38:53.885Z","level":"INFO","name":"Merv","msg":"Navigate","suite":"ey-sep29-batch-demo","testcase":"› chromium › payment.spec.js › verify user able to login1 payment"}
+{"ts":"2026-10-09T07:38:54.117Z","level":"INFO","name":"Merv","msg":"Click","suite":"ey-sep29-batch-demo","testcase":"› chromium › payment.spec.js › verify user able to login1 payment"}
+{"ts":"2026-10-09T07:38:54.151Z","level":"INFO","name":"Merv","msg":"Fill \"standard_user\"","suite":"ey-sep29-batch-demo","testcase":"› chromium › payment.spec.js › verify user able to login1 payment"}
+{"ts":"2026-10-09T07:38:54.216Z","level":"INFO","name":"Merv","msg":"Click","suite":"ey-sep29-batch-demo","testcase":"› chromium › payment.spec.js › verify user able to login1 payment"}
+{"ts":"2026-10-09T07:38:54.240Z","level":"INFO","name":"Merv","msg":"Fill \"secret_sauce\"","suite":"ey-sep29-batch-demo","testcase":"› chromium › payment.spec.js › verify user able to login1 payment"}
+{"ts":"2026-10-09T07:38:54.338Z","level":"INFO","name":"Merv","msg":"Click","suite":"ey-sep29-batch-demo","testcase":"› chromium › payment.spec.js › verify user able to login1 payment"}
+{"ts":"2026-10-09T07:38:54.586Z","level":"INFO","name":"Merv","msg":"After Hooks › Fixture \"context\" › Close context","suite":"ey-sep29-batch-demo","testcase":"› chromium › payment.spec.js › verify user able to login1 payment"}
+{"ts":"2026-10-09T07:38:54.616Z","level":"INFO","name":"Merv","msg":"Test finished —  › chromium › payment.spec.js › verify user able to login1 payment (PASSED)","suite":"ey-sep29-batch-demo","testcase":"› chromium › payment.spec.js › verify user able to login1 payment"}

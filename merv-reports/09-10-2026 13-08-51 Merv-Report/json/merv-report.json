@@ -1,0 +1,80 @@
+{
+  "version": "1.0",
+  "running": false,
+  "lastActivityMillis": 1791531534768,
+  "exportDate": "Fri Oct 09 2026 13:08:54 GMT+0530 (India Standard Time)",
+  "testSuite": {
+    "title": "ey-sep29-batch-demo",
+    "startTime": "2026-10-09T07:38:51.363Z",
+    "endTime": "2026-10-09T07:38:54.768Z",
+    "testCases": [
+      {
+        "testcaseName": " › chromium › payment.spec.js › verify user able to login1 payment",
+        "status": "PASSED",
+        "failureReason": null,
+        "tags": [
+          "chromium"
+        ],
+        "startTime": "2026-10-09T07:38:52.205Z",
+        "endTime": "2026-10-09T07:38:53.675Z",
+        "executionMachine": "Vaibhavs-Laptop.local",
+        "testSteps": [
+          {
+            "teststepName": "Navigate",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "PASSED",
+            "startTime": "2026-10-09T07:38:53.452Z",
+            "endTime": "2026-10-09T07:38:53.882Z",
+            "errorMessage": null,
+            "screenshots": []
+          },
+          {
+            "teststepName": "Click",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "PASSED",
+            "startTime": "2026-10-09T07:38:53.890Z",
+            "endTime": "2026-10-09T07:38:54.115Z",
+            "errorMessage": null,
+            "screenshots": []
+          },
+          {
+            "teststepName": "Fill \"standard_user\"",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "PASSED",
+            "startTime": "2026-10-09T07:38:54.118Z",
+            "endTime": "2026-10-09T07:38:54.149Z",
+            "errorMessage": null,
+            "screenshots": []
+          },
+          {
+            "teststepName": "Click",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "PASSED",
+            "startTime": "2026-10-09T07:38:54.152Z",
+            "endTime": "2026-10-09T07:38:54.215Z",
+            "errorMessage": null,
+            "screenshots": []
+          },
+          {
+            "teststepName": "Fill \"secret_sauce\"",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "PASSED",
+            "startTime": "2026-10-09T07:38:54.217Z",
+            "endTime": "2026-10-09T07:38:54.229Z",
+            "errorMessage": null,
+            "screenshots": []
+          },
+          {
+            "teststepName": "Click",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "PASSED",
+            "startTime": "2026-10-09T07:38:54.236Z",
+            "endTime": "2026-10-09T07:38:54.333Z",
+            "errorMessage": null,
+            "screenshots": []
+          }
+        ]
+      }
+    ]
+  }
+}

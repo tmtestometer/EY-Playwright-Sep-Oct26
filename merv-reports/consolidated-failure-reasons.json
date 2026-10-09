@@ -1,5 +1,5 @@
 {
-  "generatedAtMillis": 1791446800762,
+  "generatedAtMillis": 1791532001592,
   "failureReasons": [
     {
       "reason": "Script failure: ReferenceError: loginPageObject is not defined\n\n8 |   test(`${data.testname}`,  async ({ browser, context, page }) => {\n   9 |\n> 10 |     loginPageObject = new LoginPage(page);\n     |                    ^\n  11 |     await page.goto('https://www.saucedemo.com/'); // 200 ms\n  12 |     await loginPageObject.performLogin(data.username, data.password);\n  13 |     let actualErrorMsg = await loginPageObject.getErrorMsg();",

@@ -1,0 +1,44 @@
+{
+  "version": "1.0",
+  "running": false,
+  "lastActivityMillis": 1791531785573,
+  "exportDate": "Fri Oct 09 2026 13:13:05 GMT+0530 (India Standard Time)",
+  "testSuite": {
+    "title": "ey-sep29-batch-demo",
+    "startTime": "2026-10-09T07:42:56.753Z",
+    "endTime": "2026-10-09T07:43:05.573Z",
+    "testCases": [
+      {
+        "testcaseName": " › chromium › payment.spec.js › verify user able to login1 payment",
+        "status": "PASSED",
+        "failureReason": null,
+        "tags": [
+          "chromium"
+        ],
+        "startTime": "2026-10-09T07:42:57.673Z",
+        "endTime": "2026-10-09T07:43:04.426Z",
+        "executionMachine": "Vaibhavs-Laptop.local",
+        "testSteps": [
+          {
+            "teststepName": "Navigate",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "PASSED",
+            "startTime": "2026-10-09T07:42:59.757Z",
+            "endTime": "2026-10-09T07:43:00.010Z",
+            "errorMessage": null,
+            "screenshots": []
+          },
+          {
+            "teststepName": "Wait for timeout",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "PASSED",
+            "startTime": "2026-10-09T07:43:00.011Z",
+            "endTime": "2026-10-09T07:43:05.028Z",
+            "errorMessage": null,
+            "screenshots": []
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,4317 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Merv Live Report</title>
+    <!-- Block VS Code Live Server reload when json/screenshots change during a run -->
+    <script>
+      (function mervBlockLiveServerReload() {
+        var path = String(window.location.pathname || '');
+        if (!/merv-report-live\.html|merv-live-report\.html/i.test(path)) return;
+
+        function isLiveReloadMsg(data) {
+          return data === 'reload' || data === 'refreshcss';
+        }
+
+        try {
+          if (window.Location && Location.prototype.reload) {
+            Location.prototype.reload = function () {
+              console.warn('[Merv] reload() blocked — this report updates via JSON poll only.');
+            };
+          }
+        } catch (e) {}
+
+        var NativeWS = window.WebSocket;
+        if (!NativeWS) return;
+
+        function wrapHandler(fn) {
+          if (typeof fn !== 'function') return fn;
+          return function (ev) {
+            if (isLiveReloadMsg(ev && ev.data)) {
+              console.warn('[Merv] Ignored Live Server message "' + ev.data + '" (report data is polled from JSON).');
+              return;
+            }
+            return fn.call(this, ev);
+          };
+        }
+
+        function guardSocket(ws) {
+          var onmsg = null;
+          try {
+            Object.defineProperty(ws, 'onmessage', {
+              configurable: true,
+              enumerable: true,
+              get: function () {
+                return onmsg;
+              },
+              set: function (fn) {
+                onmsg = wrapHandler(fn);
+              },
+            });
+          } catch (e) {}
+          ws.addEventListener(
+            'message',
+            function (ev) {
+              if (isLiveReloadMsg(ev && ev.data)) {
+                ev.stopImmediatePropagation();
+              }
+            },
+            true,
+          );
+          return ws;
+        }
+
+        window.WebSocket = function (url, protocols) {
+          var ws =
+            protocols !== undefined && protocols !== null
+              ? new NativeWS(url, protocols)
+              : new NativeWS(url);
+          return guardSocket(ws);
+        };
+        window.WebSocket.prototype = NativeWS.prototype;
+        Object.setPrototypeOf(window.WebSocket, NativeWS);
+      })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --merv-grad: linear-gradient(135deg, #e90101, #c20000);
+        --sidebar-bg: #f2f3f5;
+        --sidebar-border: #e6e8ec;
+        --nav-text: #4a4a4a;
+        --nav-muted: #6b6b6b;
+        --nav-active-bg: #fdeaea;
+        --nav-active-text: #c20000;
+      }
+      html {
+        scroll-behavior: smooth;
+        font-family: 'Roboto', system-ui, -apple-system, sans-serif;
+      }
+      body {
+        font-family: 'Roboto', system-ui, -apple-system, sans-serif;
+        margin: 0;
+        padding: 0;
+        background: #fafafa;
+        color: #333;
+      }
+      button,
+      input,
+      select,
+      textarea {
+        font-family: inherit;
+      }
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        letter-spacing: 0.5px;
+      }
+      .main-wrapper {
+        display: flex;
+        min-height: 100vh;
+      }
+      .sidebar {
+        width: 400px;
+        background: var(--sidebar-bg);
+        color: var(--nav-text);
+        padding: 20px 16px;
+        overflow-y: auto;
+        position: fixed;
+        height: 100vh;
+        box-shadow: 1px 0 0 var(--sidebar-border);
+        box-sizing: border-box;
+      }
+      .sidebar-brand {
+        margin-bottom: 20px;
+        padding-bottom: 18px;
+        border-bottom: 1px solid var(--sidebar-border);
+        text-align: center;
+      }
+      .brand-logo {
+        max-width: 180px;
+        height: auto;
+        display: block;
+        margin: 0 auto;
+      }
+      .sidebar-local-label {
+        margin: 12px 0 0;
+        padding: 0;
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--nav-active-text);
+        letter-spacing: 0.04em;
+        text-align: center;
+        display: block;
+        text-decoration: none;
+        cursor: pointer;
+      }
+      .sidebar-local-label:hover {
+        color: #c20000;
+        text-decoration: underline;
+        text-underline-offset: 2px;
+      }
+      .sidebar-filters-wrap {
+        margin-bottom: 14px;
+        padding-bottom: 14px;
+        border-bottom: 1px solid var(--sidebar-border);
+      }
+      .sidebar-search-row {
+        display: flex;
+        align-items: stretch;
+        gap: 8px;
+        margin-bottom: 0;
+      }
+      .sidebar-search-row .sidebar-search {
+        flex: 1;
+        min-width: 0;
+        margin-bottom: 0;
+      }
+      .sidebar-search-row .sidebar-search input {
+        width: 100%;
+      }
+      .sidebar-filter-btn {
+        flex-shrink: 0;
+        width: 42px;
+        padding: 0;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        background: #fff;
+        color: #555;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .sidebar-filter-btn:hover {
+        border-color: #e90101;
+        color: var(--nav-active-text);
+      }
+      .sidebar-filter-btn[aria-expanded='true'] {
+        background: var(--nav-active-bg);
+        border-color: var(--nav-active-text);
+        color: var(--nav-active-text);
+      }
+      .suite-tag-panel {
+        margin-top: 10px;
+        padding: 12px;
+        background: #fff;
+        border: 1px solid #e8eaed;
+        border-radius: 8px;
+        max-height: min(40vh, 320px);
+        overflow: auto;
+      }
+      .suite-tag-panel[hidden] {
+        display: none !important;
+      }
+      .suite-adv-label {
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #6b7280;
+        margin: 0 0 6px;
+      }
+      .suite-adv-tag-cloud {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 0;
+        min-height: 24px;
+      }
+      .merv-tags-shell.merv-tags-collapsed {
+        overflow: hidden;
+      }
+      .merv-tags-shell.merv-tags-expanded {
+        overflow: visible;
+      }
+      .merv-tags-more {
+        display: inline-block;
+        margin-top: 4px;
+        padding: 0 4px;
+        border: none;
+        background: transparent;
+        color: #0d47a1;
+        font-size: 11px;
+        font-weight: 700;
+        cursor: pointer;
+        text-transform: lowercase;
+      }
+      .merv-tags-more[hidden] {
+        display: none !important;
+      }
+      .merv-tags-more:hover {
+        text-decoration: underline;
+      }
+      .suite-adv-tag-pill {
+        border: 1px solid #d6dbe2;
+        background: #f8f9fa;
+        color: #374151;
+        border-radius: 999px;
+        padding: 4px 9px;
+        font-size: 11px;
+        font-weight: 600;
+        cursor: pointer;
+        line-height: 1.2;
+      }
+      .suite-adv-tag-pill:hover {
+        border-color: #e90101;
+        color: var(--nav-active-text);
+      }
+      .suite-adv-tag-pill.selected {
+        background: var(--nav-active-bg);
+        border-color: var(--nav-active-text);
+        color: var(--nav-active-text);
+      }
+      .suite-adv-tag-empty {
+        font-size: 11px;
+        color: #9ca3af;
+      }
+      .suite-adv-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin-top: 8px;
+        flex-wrap: wrap;
+      }
+      .suite-adv-clear {
+        padding: 6px 10px;
+        border: 1px solid #d6dbe2;
+        border-radius: 6px;
+        background: #fff;
+        font-size: 11px;
+        font-weight: 600;
+        cursor: pointer;
+        color: #374151;
+      }
+      .suite-adv-clear:hover {
+        border-color: #e90101;
+        color: var(--nav-active-text);
+      }
+      #suite-adv-filter-status {
+        font-size: 11px;
+        color: #6b7280;
+      }
+      .sidebar-search {
+        margin-bottom: 16px;
+      }
+      .sidebar-search input {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        background: #fff;
+        color: #333;
+        font-size: 14px;
+        box-sizing: border-box;
+      }
+      .sidebar-search input::placeholder {
+        color: #999;
+      }
+      .sidebar-search input:focus {
+        outline: 2px solid rgba(233, 1, 1, 0.25);
+        border-color: #e90101;
+      }
+      .sidebar-filters {
+        margin-bottom: 16px;
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+      .filter-btn {
+        flex: 1;
+        min-width: 56px;
+        padding: 8px 10px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        background: #fff;
+        color: var(--nav-text);
+        font-size: 11px;
+        cursor: pointer;
+      }
+      .filter-btn.active {
+        background: var(--merv-grad);
+        color: #fff;
+        border-color: transparent;
+        font-weight: 700;
+      }
+      .sidebar h2 {
+        color: #333;
+        margin-top: 0;
+        margin-bottom: 10px;
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+      }
+      .sidebar-item {
+        padding: 12px 12px;
+        margin: 4px 0;
+        border-radius: 6px;
+        cursor: pointer;
+        border-left: 4px solid transparent;
+        background: #eceff3;
+        transition: background 0.15s;
+      }
+      .sidebar-item:hover {
+        background: #e3e7ec;
+      }
+      .sidebar-item.active {
+        background: #eceff3;
+        border-left-color: #e90101;
+        box-shadow: none;
+      }
+      .sidebar-item-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+      .sidebar-item-name {
+        font-weight: 600;
+        color: #222;
+        font-size: 14px;
+        display: block;
+        white-space: normal;
+        line-height: 1.35;
+        word-break: break-word;
+        overflow-wrap: anywhere;
+      }
+      .sidebar-status-tag {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: #dfe4ea;
+        color: #111;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+      .sidebar-status-tag.pass {
+        background: #e8f5e9;
+        color: #1b5e20;
+      }
+      .sidebar-status-tag.fail {
+        background: #ffebee;
+        color: #b71c1c;
+      }
+      .sidebar-status-tag.skip {
+        background: #fff8e1;
+        color: #e65100;
+      }
+      .sidebar-status-tag.active {
+        background: #e3f2fd;
+        color: #0d47a1;
+      }
+      .content-area {
+        margin-left: 400px;
+        flex: 1;
+        padding: 20px;
+      }
+      .report-toolbar {
+        margin-bottom: 14px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .shots-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        font-weight: 700;
+        color: #444;
+        user-select: none;
+      }
+      .shots-toggle input {
+        width: 16px;
+        height: 16px;
+        accent-color: #e90101;
+      }
+      body.hide-shots .screenshots {
+        display: none !important;
+      }
+      .test-step-title.has-shot {
+        cursor: pointer;
+      }
+      .test-step-title.has-shot:hover,
+      .test-step-title.has-shot.shots-open {
+        color: #c20000;
+      }
+      .test-step-title .step-shot-icon {
+        margin-right: 6px;
+        opacity: 0.85;
+        font-size: 13px;
+      }
+      .test-step-hd.has-shot-hd {
+        cursor: pointer;
+      }
+      .test-step-hd.has-shot-hd:hover .test-step-title.has-shot {
+        color: #c20000;
+      }
+      .step-screenshots {
+        display: none;
+        margin-top: 8px;
+      }
+      body:not(.hide-shots) .step-screenshots {
+        display: block !important;
+      }
+      body.hide-shots .step-screenshots.open {
+        display: block !important;
+      }
+      .step-screenshots .screenshot {
+        margin: 10px 0;
+      }
+      .step-screenshots .screenshot img,
+      .step-screenshots .screenshot video {
+        display: block;
+        max-width: 800px;
+        margin: 10px 0;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+      .step-screenshots .screenshot img {
+        cursor: pointer;
+      }
+      .step-screenshots .screenshot video {
+        background: #111;
+      }
+      .merv-case-videos {
+        margin-top: 18px;
+        padding-top: 12px;
+        border-top: 1px solid #e5e7eb;
+      }
+      .merv-case-videos-heading {
+        margin: 0 0 10px;
+        font-size: 13px;
+        font-weight: 700;
+        color: #374151;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .merv-case-videos .merv-case-video {
+        margin: 10px 0;
+      }
+      .merv-case-videos video {
+        display: block;
+        max-width: min(800px, 100%);
+        width: 100%;
+        background: #111;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+      .local-dash {
+        color: #c20000;
+        font-weight: 600;
+        text-decoration: none;
+        font-size: 14px;
+      }
+      .local-dash:hover {
+        text-decoration: underline;
+      }
+      .report-toolbar-links {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+      }
+      .merv-share-modal {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 10050;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+      .merv-share-modal.open {
+        display: flex;
+      }
+      .merv-share-backdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(17, 24, 39, 0.45);
+      }
+      .merv-share-panel {
+        position: relative;
+        z-index: 1;
+        width: min(560px, 100%);
+        max-height: min(90vh, 720px);
+        overflow: auto;
+        background: #fff;
+        border-radius: 14px;
+        border: 1px solid #e8eaed;
+        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.22);
+        padding: 20px 22px 18px;
+      }
+      .merv-share-panel h2 {
+        margin: 0 0 6px;
+        font-size: 18px;
+        color: #1a1a1a;
+      }
+      .merv-share-panel .share-sub {
+        margin: 0 0 14px;
+        font-size: 13px;
+        color: #6b7280;
+      }
+      .merv-share-row {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 14px;
+      }
+      .merv-share-row input {
+        flex: 1;
+        min-width: 0;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        padding: 10px 12px;
+        font-size: 13px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      }
+      .merv-share-copy {
+        appearance: none;
+        border: none;
+        border-radius: 8px;
+        padding: 0 14px;
+        background: linear-gradient(180deg, #e90101, #c20000);
+        color: #fff;
+        font-weight: 700;
+        font-size: 13px;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      .merv-share-copy:hover {
+        filter: brightness(1.05);
+      }
+      .merv-share-status {
+        min-height: 18px;
+        margin: -6px 0 12px;
+        font-size: 12px;
+        color: #1b5e20;
+        font-weight: 600;
+      }
+      .merv-share-warn {
+        margin: 0 0 12px;
+        padding: 10px 12px;
+        border-radius: 10px;
+        background: #fff7ed;
+        border: 1px solid #fed7aa;
+        color: #9a3412;
+        font-size: 13px;
+        line-height: 1.45;
+      }
+      .merv-share-notes {
+        margin: 0;
+        padding-left: 18px;
+        font-size: 13px;
+        line-height: 1.55;
+        color: #374151;
+      }
+      .merv-share-notes li {
+        margin: 0 0 10px;
+      }
+      .merv-share-notes code {
+        font-size: 12px;
+        background: #f3f4f6;
+        padding: 1px 5px;
+        border-radius: 4px;
+      }
+      .merv-share-close {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        border: none;
+        background: transparent;
+        font-size: 22px;
+        line-height: 1;
+        color: #6b7280;
+        cursor: pointer;
+      }
+      .merv-share-close:hover {
+        color: #111;
+      }
+      .failure-json-link {
+        color: #b71c1c;
+        font-weight: 600;
+        text-decoration: none;
+        font-size: 13px;
+        white-space: nowrap;
+      }
+      .failure-json-link:hover {
+        text-decoration: underline;
+      }
+      .failure-json-link[hidden] {
+        display: none !important;
+      }
+      .failure-json-link.is-empty {
+        opacity: 0.55;
+        pointer-events: none;
+        cursor: default;
+      }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: #fff;
+        padding: 24px;
+        border-radius: 10px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+      }
+      h1 {
+        color: #222;
+        border-bottom: none;
+        padding-bottom: 0;
+        margin-top: 0;
+        margin-bottom: 0;
+        font-size: 26px;
+        flex: 1;
+        min-width: 0;
+      }
+      .suite-heading {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 14px;
+        flex-wrap: wrap;
+        border-bottom: 4px solid #c20000;
+        padding-bottom: 12px;
+        margin-bottom: 10px;
+      }
+      .suite-heading-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+        margin-top: 4px;
+      }
+      .share-btn,
+      .download-btn {
+        appearance: none;
+        border: 1px solid #c20000;
+        background: #fff;
+        color: #c20000;
+        font: inherit;
+        font-size: 13px;
+        font-weight: 700;
+        padding: 6px 12px;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+      .share-btn:hover,
+      .download-btn:hover {
+        background: #fdeaea;
+      }
+      .download-btn {
+        background: linear-gradient(180deg, #e90101, #c20000);
+        color: #fff;
+        border-color: #c20000;
+      }
+      .download-btn:hover {
+        filter: brightness(1.05);
+        background: linear-gradient(180deg, #e90101, #c20000);
+      }
+      .download-btn:disabled {
+        opacity: 0.65;
+        cursor: wait;
+        filter: none;
+      }
+      .merv-download-toast {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 10060;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+      .merv-download-toast.open {
+        display: flex;
+      }
+      .merv-download-toast-backdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(17, 24, 39, 0.4);
+      }
+      .merv-download-toast-panel {
+        position: relative;
+        z-index: 1;
+        width: min(420px, 100%);
+        background: #fff;
+        border-radius: 14px;
+        border: 1px solid #e8eaed;
+        box-shadow: 0 16px 48px rgba(0, 0, 0, 0.22);
+        padding: 22px 22px 18px;
+        text-align: center;
+      }
+      .merv-download-toast-panel h2 {
+        margin: 0 0 8px;
+        font-size: 18px;
+        color: #111;
+      }
+      .merv-download-toast-panel .size-line {
+        margin: 0 0 14px;
+        font-size: 15px;
+        color: #374151;
+      }
+      .merv-download-toast-panel .size-line strong {
+        color: #c20000;
+      }
+      .merv-download-toast-panel .detail {
+        margin: 0 0 16px;
+        font-size: 13px;
+        color: #6b7280;
+        line-height: 1.45;
+      }
+      .merv-download-toast-ok {
+        appearance: none;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 18px;
+        background: linear-gradient(180deg, #e90101, #c20000);
+        color: #fff;
+        font-weight: 700;
+        font-size: 13px;
+        cursor: pointer;
+      }
+      .live-banner {
+        margin: 0 0 14px;
+        font-size: 12px;
+        color: #666;
+        min-height: 1em;
+      }
+      .report-folder-meta {
+        margin: -8px 0 14px;
+        font-size: 12px;
+        color: #4b5563;
+        word-break: break-word;
+      }
+      .stat-row-4 {
+        display: flex;
+        flex-direction: row;
+        gap: 8px;
+        margin-bottom: 16px;
+      }
+      .stat-card {
+        background-color: #fff;
+        border-radius: 8px;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+        border: 1px solid #eee;
+      }
+      a.stat-card {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+        cursor: pointer;
+      }
+      a.stat-card:hover {
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+        border-color: #ddd;
+      }
+      .stat-row-4 .stat-card {
+        flex: 1;
+        min-width: 0;
+        padding: 12px 6px;
+      }
+      .stat-card h3 {
+        margin: 0 0 6px 0;
+        color: #666;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        line-height: 1.2;
+      }
+      .stat-card .stat-value {
+        font-size: 22px;
+        font-weight: 700;
+        color: #333;
+        line-height: 1.1;
+      }
+      .stat-card.total .stat-value {
+        color: #c20000;
+      }
+      .stat-card.passed .stat-value {
+        color: #4caf50;
+      }
+      .stat-card.failed .stat-value {
+        color: #f44336;
+      }
+      .stat-card.skipped .stat-value {
+        color: #ff9800;
+      }
+      .pie-chart-container {
+        text-align: center;
+        background: #fff;
+        padding: 14px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+        border: 1px solid #eee;
+      }
+      .pie-legend {
+        display: flex;
+        justify-content: center;
+        gap: 16px;
+        margin-top: 12px;
+        flex-wrap: wrap;
+      }
+      .pie-legend-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .pie-legend-color {
+        width: 14px;
+        height: 14px;
+        border-radius: 3px;
+        flex-shrink: 0;
+      }
+      .pie-legend-label {
+        font-size: 12px;
+        color: #333;
+      }
+      .stats-section {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        align-items: flex-start;
+      }
+      .stats-left-col {
+        flex: 0 0 40%;
+        max-width: 40%;
+        min-width: 260px;
+      }
+      .stats-right-col {
+        flex: 1 1 55%;
+        min-width: 280px;
+      }
+      @media (max-width: 900px) {
+        .stats-left-col,
+        .stats-right-col {
+          flex: 1 1 100%;
+          max-width: 100%;
+        }
+      }
+      .failure-reasons-panel {
+        background: #fff;
+        border: 1px solid #eee;
+        border-radius: 8px;
+        padding: 14px 16px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+        max-height: 420px;
+        overflow: auto;
+      }
+      .failure-reasons-panel h3 {
+        margin: 0 0 12px 0;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #c20000;
+      }
+      .failure-reason-empty {
+        color: #888;
+        font-size: 13px;
+        margin: 0;
+      }
+      .failure-reason-group {
+        border: 1px solid #eef0f3;
+        border-radius: 8px;
+        padding: 8px 10px;
+        margin: 8px 0;
+        background: #fcfcfd;
+      }
+      .failure-reason-row {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 10px 8px;
+        cursor: pointer;
+        border-radius: 6px;
+        margin: 0 -4px;
+        user-select: none;
+      }
+      .failure-reason-row:hover {
+        background: #f3f4f6;
+      }
+      .failure-reason-caret {
+        flex-shrink: 0;
+        font-size: 10px;
+        color: #c20000;
+        margin-right: 6px;
+        margin-top: 4px;
+        transition: transform 0.2s ease;
+        line-height: 1;
+      }
+      .failure-reason-group.open .failure-reason-caret {
+        transform: rotate(90deg);
+      }
+      .failure-reason-text {
+        flex: 1;
+        min-width: 0;
+        font-size: 13px;
+        color: #333;
+        line-height: 1.45;
+        word-break: break-word;
+        white-space: pre-wrap;
+      }
+      .failure-reason-count {
+        flex-shrink: 0;
+        font-weight: 700;
+        font-size: 13px;
+        color: #f44336;
+        min-width: 2em;
+        text-align: right;
+      }
+      .failure-related-cases {
+        display: none;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 6px;
+        padding: 4px 8px 8px 22px;
+        border-top: 1px solid #f0f0f0;
+      }
+      .failure-reason-group.open .failure-related-cases {
+        display: flex;
+      }
+      .failure-case-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+      .failure-case-link {
+        border: none;
+        background: transparent;
+        color: #0d47a1;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        padding: 0;
+        text-align: left;
+        text-decoration: underline;
+        text-underline-offset: 2px;
+      }
+      .failure-case-link:hover {
+        color: #08306f;
+      }
+      .failure-case-thumb {
+        width: 72px;
+        height: 42px;
+        object-fit: cover;
+        border: 1px solid #d7dce2;
+        border-radius: 6px;
+        cursor: pointer;
+        flex-shrink: 0;
+      }
+      .test-case {
+        margin: 15px 0;
+        padding: 15px;
+        border-left: 4px solid #ddd;
+        background-color: #f9f9f9;
+        color: #333;
+      }
+      .test-case.passed {
+        border-left-color: #4caf50;
+      }
+      .test-case.failed {
+        border-left-color: #f44336;
+      }
+      .test-case.skipped {
+        border-left-color: #ff9800;
+      }
+      .test-case.in_progress {
+        border-left-color: #2196f3;
+      }
+      .testcase-desc {
+        margin: 8px 0 14px;
+        padding: 0;
+        font-size: 13px;
+        line-height: 1.45;
+        color: #555;
+        word-break: break-word;
+      }
+      .testcase-heading {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 10px 12px;
+        margin: -2px -2px 12px;
+        background: #fff;
+        border: 1px solid #eceff3;
+        border-radius: 10px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+      }
+      .testcase-title {
+        margin: 0;
+        font-size: 26px;
+        font-weight: 700;
+        letter-spacing: 0.01em;
+        color: #042664;
+        line-height: 1.3;
+        word-break: break-word;
+      }
+      .testcase-status-chip {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 6px 12px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        border: 1px solid #d0d7de;
+        background: #eef2f6;
+        color: #364152;
+        white-space: nowrap;
+      }
+      .testcase-status-chip.passed {
+        background: #e8f5e9;
+        color: #1b5e20;
+        border-color: #c8e6c9;
+      }
+      .testcase-status-chip.failed {
+        background: #ffebee;
+        color: #b71c1c;
+        border-color: #ffcdd2;
+      }
+      .testcase-status-chip.skipped {
+        background: #fff8e1;
+        color: #e65100;
+        border-color: #ffe0b2;
+      }
+      .testcase-status-chip.in_progress {
+        background: #e3f2fd;
+        color: #0d47a1;
+        border-color: #bbdefb;
+      }
+      .testcase-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 6px 0 10px;
+      }
+      .testcase-tag {
+        display: inline-flex;
+        align-items: center;
+        height: 20px;
+        padding: 0 10px;
+        border-radius: 999px;
+        background: #eaf1ff;
+        border: 1px solid #cfdcff;
+        color: #153a7a;
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 20px;
+      }
+      .sidebar-item-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        margin-top: 6px;
+      }
+      .sidebar-item-tag {
+        display: inline-flex;
+        align-items: center;
+        height: 16px;
+        padding: 0 7px;
+        border-radius: 999px;
+        background: #eef4ff;
+        border: 1px solid #d4def2;
+        color: #163b7a;
+        font-size: 10px;
+        font-weight: 600;
+        line-height: 16px;
+      }
+      .testcase-meta-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 10px;
+        margin: 0 0 12px;
+      }
+      .testcase-meta-item {
+        background: #fff;
+        border: 1px solid #eceff3;
+        border-radius: 10px;
+        padding: 10px 12px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+      }
+      .testcase-meta-label {
+        display: block;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #6b7280;
+        margin-bottom: 4px;
+      }
+      .testcase-meta-value {
+        font-size: 13px;
+        font-weight: 600;
+        color: #1f2937;
+        word-break: break-word;
+      }
+      .error {
+        color: #f44336;
+        font-size: 0.9em;
+        margin-top: 5px;
+        background-color: #ffebee;
+        padding: 8px;
+        border-radius: 3px;
+        border-left: 3px solid #f44336;
+        white-space: pre-wrap;
+        word-break: break-word;
+        line-height: 1.45;
+      }
+      .test-step {
+        margin: 8px 0;
+        padding: 8px;
+        background-color: #fff;
+        border-radius: 3px;
+        color: #333;
+      }
+      .test-step.passed {
+        border-left: 3px solid #4caf50;
+      }
+      .test-step.failed {
+        border-left: 3px solid #f44336;
+      }
+      .test-step.skipped {
+        border-left: 3px solid #ff9800;
+      }
+      .test-step.in_progress {
+        border-left: 3px solid #ffc107;
+      }
+      .step-logs {
+        margin-top: 12px;
+      }
+      .step-logs > p,
+      .merv-case-logs-heading {
+        color: #333;
+        font-weight: 700;
+        margin: 0 0 8px;
+        font-size: 13px;
+      }
+      .merv-case-logs-block {
+        margin-top: 18px;
+      }
+      .log-container {
+        background: #f5f5f5;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        padding: 10px;
+        max-height: 360px;
+        overflow-y: auto;
+        font-family: ui-monospace, 'Cascadia Code', 'Courier New', monospace;
+        font-size: 12px;
+        line-height: 1.45;
+      }
+      .log-line {
+        padding: 3px 0;
+        border-bottom: 1px solid #eee;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+      }
+      .log-line:last-child {
+        border-bottom: none;
+      }
+      .log-info {
+        color: #333;
+      }
+      .log-error {
+        color: #d32f2f;
+        font-weight: 700;
+        background: #ffebee;
+        padding: 2px 5px;
+        border-radius: 2px;
+      }
+      .log-warn {
+        color: #f57c00;
+        background: #fff3e0;
+        padding: 2px 5px;
+        border-radius: 2px;
+      }
+      .log-debug {
+        color: #616161;
+      }
+      .log-trace {
+        color: #7c3aed;
+      }
+      .test-step-hd {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        margin: 0 0 6px;
+        flex-wrap: wrap;
+      }
+      .test-step-title {
+        margin: 0;
+        flex: 1;
+        min-width: 0;
+        font-size: 14px;
+        font-weight: 600;
+        color: #333;
+        line-height: 1.35;
+        word-break: break-word;
+      }
+      .test-step-badges {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+        flex-wrap: wrap;
+      }
+      .step-type-pill {
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #424242;
+        background: linear-gradient(180deg, #f0f3fa, #e8ecf6);
+        border: 1px solid rgba(0, 0, 0, 0.06);
+        padding: 3px 10px;
+        border-radius: 999px;
+      }
+      .step-meta {
+        margin-top: 8px;
+        padding: 10px 12px;
+        background: #f8fafc;
+        border: 1px solid #e8ecf2;
+        border-radius: 8px;
+        font-size: 13px;
+      }
+      .step-meta-row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        margin-top: 6px;
+      }
+      .step-meta-row:first-child {
+        margin-top: 0;
+      }
+      .step-meta-key {
+        min-width: 88px;
+        font-weight: 700;
+        color: #555;
+        flex-shrink: 0;
+      }
+      .step-meta-val {
+        flex: 1;
+        min-width: 120px;
+        word-break: break-word;
+        color: #222;
+        white-space: pre-wrap;
+      }
+      .merv-api-card {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+      }
+      .merv-api-section {
+        border-radius: 10px;
+        border: 1px solid transparent;
+        overflow: hidden;
+      }
+      .merv-api-section--request {
+        border-color: #93c5fd;
+        background: linear-gradient(180deg, #eff6ff 0%, #f8fbff 100%);
+      }
+      .merv-api-section--response {
+        border-color: #86efac;
+        background: linear-gradient(180deg, #ecfdf5 0%, #f7fdf9 100%);
+      }
+      .merv-api-section-title {
+        margin: 0;
+        padding: 8px 12px;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .merv-api-section--request .merv-api-section-title {
+        color: #1d4ed8;
+        background: rgba(59, 130, 246, 0.12);
+        border-bottom: 1px solid #bfdbfe;
+      }
+      .merv-api-section--response .merv-api-section-title {
+        color: #047857;
+        background: rgba(16, 185, 129, 0.12);
+        border-bottom: 1px solid #bbf7d0;
+      }
+      .merv-api-rows {
+        padding: 8px 12px 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .merv-api-row {
+        display: grid;
+        grid-template-columns: 148px minmax(0, 1fr);
+        gap: 8px 12px;
+        align-items: start;
+      }
+      @media (max-width: 640px) {
+        .merv-api-row {
+          grid-template-columns: 1fr;
+          gap: 4px;
+        }
+      }
+      .merv-api-key {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        padding-top: 2px;
+      }
+      .merv-api-section--request .merv-api-key {
+        color: #1e40af;
+      }
+      .merv-api-section--response .merv-api-key {
+        color: #065f46;
+      }
+      .merv-api-val {
+        min-width: 0;
+        font-size: 12.5px;
+        color: #111827;
+        word-break: break-word;
+      }
+      .merv-api-val-plain {
+        white-space: pre-wrap;
+      }
+      .merv-api-method {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        color: #1e3a8a;
+        background: #dbeafe;
+        border: 1px solid #93c5fd;
+      }
+      .merv-api-status {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 800;
+        color: #065f46;
+        background: #d1fae5;
+        border: 1px solid #6ee7b7;
+      }
+      .merv-api-status.is-error {
+        color: #991b1b;
+        background: #fee2e2;
+        border-color: #fca5a5;
+      }
+      .merv-api-pre-wrap {
+        margin: 0;
+        padding: 8px 10px;
+        border-radius: 8px;
+        background: rgba(15, 23, 42, 0.04);
+        border: 1px solid rgba(15, 23, 42, 0.08);
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        font-size: 11.5px;
+        line-height: 1.45;
+        white-space: pre-wrap;
+        word-break: break-word;
+        max-height: none;
+        overflow: auto;
+      }
+      .merv-api-pre-wrap.is-collapsed {
+        max-height: 8.7em; /* ~6 lines */
+        overflow: hidden;
+      }
+      .merv-api-show-full {
+        display: inline-block;
+        margin-top: 6px;
+        font-size: 12px;
+        font-weight: 700;
+        color: #c20000;
+        text-decoration: underline;
+        cursor: pointer;
+        background: none;
+        border: 0;
+        padding: 0;
+        font-family: inherit;
+      }
+      .merv-api-show-full:hover {
+        color: #9a0000;
+      }
+      .step-meta-val img,
+      .merv-inline-image,
+      .error img {
+        display: block;
+        max-width: 100%;
+        height: auto;
+        margin: 8px 0;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        background: #fff;
+      }
+      .screenshots {
+        margin-top: 10px;
+      }
+      .screenshot {
+        margin: 10px 0;
+      }
+      .screenshot img {
+        display: block;
+        max-width: 800px;
+        margin: 10px 0;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      .status-pill {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        background: linear-gradient(135deg, #e90101, #c20000);
+        color: #fff;
+        font-size: 11px;
+        font-weight: 700;
+        margin-left: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .status-pill.aborted {
+        background: #6c757d !important;
+      }
+      .testdata-files {
+        margin: 8px 0 0;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        width: 90%;
+        max-width: 90%;
+      }
+      .testdata-file-bar {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 14px;
+        background: linear-gradient(135deg, #4a90d9 0%, #3b7fc4 100%);
+        border-radius: 10px;
+        color: #fff;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .testdata-file-bar-icon {
+        flex: 0 0 36px;
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.15);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        opacity: 0.9;
+      }
+      .testdata-file-bar-info {
+        flex: 1;
+        min-width: 0;
+      }
+      .testdata-file-bar-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+      }
+      .testdata-file-bar-name {
+        font-weight: 600;
+        font-size: 14px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .testdata-file-bar-badge {
+        flex-shrink: 0;
+        font-size: 10px;
+        font-weight: 700;
+        padding: 2px 6px;
+        border-radius: 4px;
+        background: rgba(0, 0, 0, 0.2);
+        color: rgba(255, 255, 255, 0.85);
+      }
+      .testdata-file-bar-size {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.75);
+        margin-top: 2px;
+      }
+      .testdata-file-bar-oversize {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.92);
+        margin-top: 4px;
+        font-style: italic;
+      }
+      .testdata-file-bar-actions {
+        display: flex;
+        gap: 6px;
+        flex-shrink: 0;
+      }
+      .testdata-file-bar-btn {
+        border: none;
+        background: transparent;
+        color: #fff;
+        width: 34px;
+        height: 34px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 16px;
+        line-height: 1;
+      }
+      .testdata-file-bar-btn:hover {
+        background: rgba(255, 255, 255, 0.18);
+      }
+      .testdata-flat-file {
+        border: 1px solid #e6e8ec;
+        border-radius: 8px;
+        background: #f7f8fa;
+        padding: 10px 12px;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .testdata-flat-file-head {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+      .testdata-flat-file-name {
+        font-weight: 600;
+        font-size: 13px;
+        color: #333;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .testdata-flat-file-badge {
+        font-size: 10px;
+        font-weight: 700;
+        padding: 2px 6px;
+        border-radius: 4px;
+        background: #e3f2fd;
+        color: #1565c0;
+      }
+      .testdata-flat-file-preview {
+        margin: 0;
+        padding: 8px 10px;
+        background: #fff;
+        border: 1px solid #e9ecef;
+        border-radius: 6px;
+        font-size: 12px;
+        line-height: 1.45;
+        max-height: 220px;
+        overflow: auto;
+        white-space: pre-wrap;
+        word-break: break-word;
+        color: #333;
+      }
+      .testdata-flat-file-link {
+        display: inline-block;
+        margin-top: 8px;
+        color: #007bff;
+        font-size: 13px;
+        cursor: pointer;
+        text-decoration: underline;
+      }
+      .testdata-image-file {
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .testdata-image-file-preview {
+        display: block;
+        max-width: 100%;
+        max-height: 420px;
+        width: auto;
+        height: auto;
+        border-radius: 6px;
+        border: 1px solid #e9ecef;
+        background: #fff;
+        object-fit: contain;
+        cursor: zoom-in;
+      }
+      .merv-image-lightbox {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 10000;
+      }
+      .merv-image-lightbox.open {
+        display: block;
+      }
+      .merv-image-lightbox-backdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.72);
+      }
+      .merv-image-lightbox-panel {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: min(92vw, 1100px);
+        max-height: 92vh;
+        background: #fff;
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+      }
+      .merv-image-lightbox-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 14px;
+        border-bottom: 1px solid #e9ecef;
+        background: #f8f9fa;
+      }
+      .merv-image-lightbox-title {
+        font-weight: 600;
+        font-size: 14px;
+        color: #333;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        padding-right: 8px;
+      }
+      .merv-image-lightbox-close {
+        border: none;
+        background: transparent;
+        font-size: 22px;
+        line-height: 1;
+        cursor: pointer;
+        color: #666;
+        padding: 0 4px;
+      }
+      .merv-image-lightbox-viewport {
+        flex: 1;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 280px;
+        max-height: calc(92vh - 110px);
+        background: #1a1a1a;
+        padding: 12px;
+        cursor: grab;
+        user-select: none;
+        touch-action: none;
+      }
+      .merv-image-lightbox-viewport.dragging {
+        cursor: grabbing;
+      }
+      .merv-image-lightbox-img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        transform-origin: center center;
+        transition: transform 0.15s ease;
+        pointer-events: none;
+      }
+      .merv-image-lightbox-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 10px 14px;
+        border-top: 1px solid #e9ecef;
+        background: #f8f9fa;
+      }
+      .merv-image-lightbox-toolbar button {
+        border: 1px solid #ced4da;
+        background: #fff;
+        border-radius: 6px;
+        padding: 6px 12px;
+        cursor: pointer;
+        font-size: 13px;
+      }
+      .merv-image-lightbox-toolbar button:hover {
+        background: #f1f3f5;
+      }
+      .merv-image-lightbox-zoom-label {
+        min-width: 48px;
+        text-align: center;
+        font-weight: 600;
+        font-size: 13px;
+        color: #333;
+      }
+    
+      /* Embed mode: only testcase-content (used by Title-wise instance panel) */
+      html.merv-embed-mode .sidebar,
+      html.merv-embed-mode .report-toolbar,
+      html.merv-embed-mode .suite-heading,
+      html.merv-embed-mode .suite-heading-actions,
+      html.merv-embed-mode .live-banner,
+      html.merv-embed-mode .report-folder-meta,
+      html.merv-embed-mode .stats-section,
+      html.merv-embed-mode .merv-share-modal,
+      html.merv-embed-mode .download-toast {
+        display: none !important;
+      }
+      html.merv-embed-mode .content-area {
+        margin-left: 0 !important;
+        padding: 12px !important;
+      }
+      html.merv-embed-mode .main-wrapper {
+        min-height: auto;
+      }
+      html.merv-embed-mode #testcase-content {
+        display: block !important;
+      }
+
+    </style>
+  </head>
+  <body>
+    <div class="main-wrapper">
+      <div class="sidebar">
+        <div class="sidebar-brand">
+          <img class="brand-logo" src="https://merv.online/images/logo-red.png" alt="Merv" />
+          <a class="sidebar-local-label" href="../../index.html" title="Open local dashboard">Merv Local</a>
+        </div>
+
+        <div class="sidebar-filters-wrap" id="sidebar-filters-wrap">
+          <div class="sidebar-filters" role="group" aria-label="Filter by status">
+            <button type="button" class="filter-btn active" data-status="all">All</button>
+            <button type="button" class="filter-btn" data-status="passed">Pass</button>
+            <button type="button" class="filter-btn" data-status="failed">Fail</button>
+            <button type="button" class="filter-btn" data-status="skipped">Skip</button>
+          </div>
+          <div class="sidebar-search-row">
+            <div class="sidebar-search">
+              <input type="search" id="testcase-search" placeholder="Search test cases…" autocomplete="off" />
+            </div>
+            <button
+              type="button"
+              class="sidebar-filter-btn"
+              id="sidebar-filter-btn"
+              aria-expanded="false"
+              aria-controls="suite-tag-panel"
+              title="Filter by tags"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+            </button>
+          </div>
+          <div class="suite-tag-panel" id="suite-tag-panel" hidden>
+            <p class="suite-adv-label">Tags <span style="font-weight:500;text-transform:none;letter-spacing:0">(click to filter)</span></p>
+            <div class="merv-tags-shell merv-tags-collapsed" data-merv-tag-rows="3" data-merv-tag-row-px="22" data-merv-tag-gap-px="6">
+              <div id="suite-adv-tag-cloud" class="suite-adv-tag-cloud"><span class="suite-adv-tag-empty">Loading tags…</span></div>
+            </div>
+            <div class="suite-adv-actions">
+              <button type="button" class="suite-adv-clear" id="suite-adv-clear">Clear tag filters</button>
+              <span id="suite-adv-filter-status" aria-live="polite"></span>
+            </div>
+          </div>
+        </div>
+
+        <h2>Test Cases</h2>
+        <div id="sidebar-list"></div>
+      </div>
+
+      <div class="content-area">
+        <div class="container">
+          <div class="report-toolbar">
+            <div class="report-toolbar-links">
+              <a class="local-dash" href="../../index.html">Local Dashboard</a>
+              <a
+                id="failure-json-link"
+                class="failure-json-link"
+                href="../json/failure-test.json"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Open failure-test.json (failed testcases and TEST_DATA steps). After the run completes, also at ../failure-test.json and report root."
+                hidden
+                >Failures JSON</a
+              >
+            </div>
+            <label class="shots-toggle">
+              <input id="toggle-shots" type="checkbox" checked />
+              Show screenshots
+            </label>
+          </div>
+
+          <div class="suite-heading">
+            <h1 id="suite-title">
+              Merv Live Runtime Report
+              <span id="run-state" class="status-pill">RUNNING</span>
+            </h1>
+            <div class="suite-heading-actions" id="suite-heading-actions">
+              <button type="button" class="share-btn" id="share-report-btn" title="Share this report link">Share</button>
+              <button type="button" class="download-btn" id="download-report-btn" title="Download emailable report and offline zip">Download</button>
+            </div>
+          </div>
+          <p id="live-banner" class="live-banner"></p>
+          <p id="report-folder" class="report-folder-meta"></p>
+
+          <div class="stats-section">
+            <div class="stats-left-col">
+              <div class="stat-row-4">
+                <a href="#" class="stat-card total" style="background: white" onclick="return filterShowAllTestCases();" title="Show all test cases in the sidebar">
+                  <h3>Total</h3>
+                  <div id="total-count" class="stat-value">0</div>
+                </a>
+                <div class="stat-card passed">
+                  <h3>Passed</h3>
+                  <div id="passed-count" class="stat-value">0</div>
+                </div>
+                <div class="stat-card failed">
+                  <h3>Failed</h3>
+                  <div id="failed-count" class="stat-value">0</div>
+                </div>
+                <div class="stat-card skipped">
+                  <h3>Skipped</h3>
+                  <div id="skipped-count" class="stat-value">0</div>
+                </div>
+              </div>
+
+              <div class="pie-chart-container">
+                <canvas id="pieChart" width="300" height="300"></canvas>
+                <div class="pie-legend">
+                  <span class="pie-legend-item">
+                    <span class="pie-legend-color" style="background: #4caf50"></span>
+                    <span id="leg-p" class="pie-legend-label">Passed (0)</span>
+                  </span>
+                  <span class="pie-legend-item">
+                    <span class="pie-legend-color" style="background: #f44336"></span>
+                    <span id="leg-f" class="pie-legend-label">Failed (0)</span>
+                  </span>
+                  <span class="pie-legend-item">
+                    <span class="pie-legend-color" style="background: #ff9800"></span>
+                    <span id="leg-k" class="pie-legend-label">Skipped (0)</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="stats-right-col">
+              <div class="failure-reasons-panel" id="failure-reasons-panel">
+                <h3>Failure reasons</h3>
+                <p class="failure-reason-empty">No failures yet.</p>
+              </div>
+            </div>
+          </div>
+
+          <div id="testcase-content"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="merv-share-modal" id="merv-share-modal" aria-hidden="true">
+      <div class="merv-share-backdrop" id="merv-share-backdrop"></div>
+      <div class="merv-share-panel" role="dialog" aria-labelledby="merv-share-title">
+        <button type="button" class="merv-share-close" id="merv-share-close" aria-label="Close">×</button>
+        <h2 id="merv-share-title">Share this report</h2>
+        <p class="share-sub">Copy this link and send it to someone on your network.</p>
+        <div class="merv-share-row">
+          <input id="merv-share-link" type="text" readonly spellcheck="false" />
+          <button type="button" class="merv-share-copy" id="merv-share-copy">Copy</button>
+        </div>
+        <div class="merv-share-status" id="merv-share-status" aria-live="polite"></div>
+        <div class="merv-share-warn" id="merv-share-warn" hidden></div>
+        <ol class="merv-share-notes">
+          <li>
+            The port must be reachable and <strong>not blocked by a firewall</strong>. The person you share with
+            must be on the <strong>same network</strong>.
+          </li>
+          <li>
+            The report is visible <strong>only while the MERV report server is running</strong> on your machine
+            (<code>npx merv show-report</code>). When you stop the server, the link stops working.
+          </li>
+          <li>
+            If the port is blocked, run the report on an allowed port (usually <strong>80</strong> or
+            <strong>443</strong>), for example:
+            <code>npx merv show-report --host 0.0.0.0 --port 80</code>
+            — or allow your port in firewall settings. Use <code>--host 0.0.0.0</code> so LAN clients can connect
+            (default <code>127.0.0.1</code> is local-only).
+          </li>
+          <li>
+            If you still cannot share, use <strong>Merv-Server</strong>
+            (<code>merv.local=false</code> with your MERV API key) so the report is hosted online.
+          </li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="merv-download-toast" id="merv-download-toast" aria-hidden="true">
+      <div class="merv-download-toast-backdrop" id="merv-download-toast-backdrop"></div>
+      <div class="merv-download-toast-panel" role="dialog" aria-labelledby="merv-download-toast-title">
+        <h2 id="merv-download-toast-title">Zip folder downloaded</h2>
+        <p class="size-line">Size — <strong id="merv-download-toast-size">—</strong></p>
+        <p class="detail" id="merv-download-toast-detail">
+          Emailable report and offline zip (with <code>index.html</code>) were saved.
+        </p>
+        <button type="button" class="merv-download-toast-ok" id="merv-download-toast-ok">OK</button>
+      </div>
+    </div>
+
+    <script>
+
+      (function mervEmbedMode(){
+        try {
+          var q = new URLSearchParams(window.location.search);
+          if (q.get('embed') === '1') document.documentElement.classList.add('merv-embed-mode');
+        } catch (e) {}
+      })();
+
+      // Injected at generation-time for file:// fallback.
+      // `merv-report.html` will embed the snapshot JSON; live reports keep this null.
+      window.__MERV_INLINE_REPORT__ = {
+  "version": "1.0",
+  "running": false,
+  "lastActivityMillis": 1791531772112,
+  "exportDate": "Fri Oct 09 2026 13:12:52 GMT+0530 (India Standard Time)",
+  "testSuite": {
+    "title": "ey-sep29-batch-demo",
+    "startTime": "2026-10-09T07:42:43.341Z",
+    "endTime": "2026-10-09T07:42:52.112Z",
+    "testCases": [
+      {
+        "testcaseName": " › chromium › payment.spec.js › verify user able to login1 payment",
+        "status": "PASSED",
+        "failureReason": null,
+        "tags": [
+          "chromium"
+        ],
+        "startTime": "2026-10-09T07:42:44.134Z",
+        "endTime": "2026-10-09T07:42:50.530Z",
+        "executionMachine": "Vaibhavs-Laptop.local",
+        "testSteps": [
+          {
+            "teststepName": "Navigate",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "PASSED",
+            "startTime": "2026-10-09T07:42:46.189Z",
+            "endTime": "2026-10-09T07:42:46.560Z",
+            "errorMessage": null,
+            "screenshots": []
+          },
+          {
+            "teststepName": "Wait for timeout",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "PASSED",
+            "startTime": "2026-10-09T07:42:46.564Z",
+            "endTime": "2026-10-09T07:42:51.591Z",
+            "errorMessage": null,
+            "screenshots": []
+          }
+        ]
+      }
+    ]
+  }
+};
+
+      function escHtml(s) {
+        return String(s || '').replace(/[&<>\"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+      }
+      /** Strip Playwright terminal color codes from error text for readable HTML. */
+      function stripAnsi(s) {
+        if (s == null) return '';
+        var t = String(s);
+        t = t.replace(/\u001b\[[0-9?]*[ -/]*[@-~]/g, '');
+        t = t.replace(/\[(?:\d{1,3})(?:;\d{1,3})*m/g, '');
+        return t;
+      }
+      /** Readable multiline errors (preserve \\n; unwrap common Playwright one-line messages). */
+      function formatErrorTextForDisplay(s) {
+        let t = stripAnsi(String(s || ''));
+        if (!/\r?\n/.test(t)) {
+          t = t.replace(/\s+Call log:\s*/i, '\n\nCall log:\n');
+          t = t.replace(/\s+-\s+(Expect\s+"|waiting for\s+|locator\.)/gi, '\n  - $1');
+        }
+        return t;
+      }
+      /** Suite/KPI grouping key — failure title + description only (no Call log or stack frames). */
+      function failureReasonGroupingKey(s) {
+        let t = stripAnsi(String(s || '')).trim();
+        if (!t) return '(No failure message)';
+        const m = t.search(/\n\s*Call log:\s*/i);
+        if (m >= 0) t = t.slice(0, m).trim();
+        t = t
+          .split('\n')
+          .filter(function (line) {
+            return !/^\s*at\s+/.test(line);
+          })
+          .join('\n')
+          .replace(/\n{3,}/g, '\n\n')
+          .trim();
+        return t || '(No failure message)';
+      }
+      /** Run-relative paths (e.g. screenshots/x.png) become ../screenshots/x.png from html/. Legacy absolute paths use file:// where possible. */
+      function screenshotSrcForHtml(stored) {
+        let s = String(stored || '').trim();
+        if (!s) return '';
+        s = s.replace(/\\/g, '/');
+        if (/^https?:\/\//i.test(s) || /^data:/i.test(s)) return s;
+        if (s.startsWith('../') || s.startsWith('./')) return s;
+        if (s.startsWith('/')) return 'file://' + s;
+        if (/^[a-zA-Z]:\//.test(s)) return 'file:///' + s;
+        return '../' + s.replace(/^\//, '');
+      }
+      function statusClass(st) {
+        const x = String(st || '').toLowerCase();
+        return x === 'passed' || x === 'failed' || x === 'skipped' || x === 'in_progress' ? x : 'in_progress';
+      }
+      function statusTag(st) {
+        const x = String(st || '').toLowerCase();
+        if (x === 'passed') return { txt: 'PASS', cls: 'pass' };
+        if (x === 'failed') return { txt: 'FAIL', cls: 'fail' };
+        if (x === 'skipped') return { txt: 'SKIP', cls: 'skip' };
+        return { txt: 'ACTIVE', cls: 'active' };
+      }
+      function parseTs(v) {
+        if (v == null) return null;
+        if (typeof v === 'number') return new Date(v > 1e11 ? v : v * 1000);
+        if (typeof v === 'string') {
+          const d = new Date(v);
+          return isNaN(d.getTime()) ? null : d;
+        }
+        if (typeof v === 'object' && v) {
+          if (typeof v.time === 'number') return new Date(v.time);
+          if (Array.isArray(v) && v.length >= 3) return new Date(v[0], (v[1] || 1) - 1, v[2] || 1, v[3] || 0, v[4] || 0, v[5] || 0);
+        }
+        const d = new Date(v);
+        return isNaN(d.getTime()) ? null : d;
+      }
+      function lastActivityMs(d) {
+        const n = d && d.lastActivityMillis;
+        if (typeof n === 'number' && n > 0) return n;
+        const p = Date.parse(String((d && d.exportDate) || ''));
+        return isNaN(p) ? 0 : p;
+      }
+      const STALE_MS = 60_000;
+      function isStaleAborted(d) {
+        if (!d || d.running !== true) return false;
+        if (d.aborted === true) return true;
+        const la = lastActivityMs(d);
+        if (!la) return false;
+        return Date.now() - la > STALE_MS;
+      }
+      function detectReportFolderName() {
+        try {
+          const p = String(window.location.pathname || '').replace(/\\/g, '/');
+          const parts = p.split('/').filter(Boolean);
+          const htmlIdx = parts.lastIndexOf('html');
+          if (htmlIdx > 0) return decodeURIComponent(parts[htmlIdx - 1]);
+          if (parts.length > 1) return decodeURIComponent(parts[parts.length - 2]);
+        } catch {}
+        return '—';
+      }
+
+      let currentSearch = '';
+      const suiteAdvSelectedTags = {};
+      const suiteStatusFilters = { passed: true, failed: true, skipped: true, in_progress: true };
+      let currentFilter = 'all';
+      const SUITE_TAG_PANEL_KEY = 'merv.suiteTagPanel.open';
+      let selectedId = '';
+      /** Per-step screenshot panels left open when "Show screenshots" is off (key = caseId|stepIdx). */
+      const openStepShots = {};
+      /** Stable across polls — {@code tc-N} index alone can point at a different test when the list grows. */
+      let selectedTestcaseName = '';
+      let appliedUrlTestcase = false;
+      let latestData = null;
+      let pollTimer = null;
+      /** Skip re-patching the open case panel when its content signature is unchanged (keeps video/streaming stable). */
+      let lastPatchedCaseSig = '';
+
+      function stopPolling() {
+        if (pollTimer !== null) {
+          clearInterval(pollTimer);
+          pollTimer = null;
+        }
+      }
+
+      function startPollingIfNeeded() {
+        if (pollTimer !== null) return;
+        pollTimer = setInterval(load, 800);
+      }
+
+      function selectionStorageKey() {
+        return 'merv.live.selected.' + detectReportFolderName();
+      }
+
+      function isEmbedMode() {
+        try {
+          if (document.documentElement.classList.contains('merv-embed-mode')) return true;
+          return new URLSearchParams(window.location.search).get('embed') === '1';
+        } catch {
+          return false;
+        }
+      }
+
+      function normalizeTestcaseName(s) {
+        return String(s || '')
+          .trim()
+          .replace(/\u00bb/g, '\u203a')
+          .replace(/\s+/g, ' ');
+      }
+
+      function saveSelectedTestcase(name, idx) {
+        selectedTestcaseName = normalizeTestcaseName(name);
+        if (typeof idx === 'number' && idx >= 0) selectedId = 'tc-' + idx;
+        // Embed iframes must not pollute the suite's last-selected case in sessionStorage.
+        if (isEmbedMode()) return;
+        try {
+          sessionStorage.setItem(
+            selectionStorageKey(),
+            JSON.stringify({ name: selectedTestcaseName, idx: typeof idx === 'number' ? idx : -1 }),
+          );
+        } catch {}
+      }
+
+      function restoreSelectedTestcaseName(testCases) {
+        if (selectedTestcaseName) return;
+        // URL ?testcase= always wins over sessionStorage (deep links + cons-title embeds).
+        try {
+          const q = (new URLSearchParams(window.location.search).get('testcase') || '').trim();
+          if (q) {
+            selectedTestcaseName = normalizeTestcaseName(q);
+            selectedId = '';
+            appliedUrlTestcase = true;
+            return;
+          }
+        } catch {}
+        if (isEmbedMode()) return;
+        try {
+          const saved = sessionStorage.getItem(selectionStorageKey());
+          if (saved) {
+            try {
+              const o = JSON.parse(saved);
+              if (o && o.name) selectedTestcaseName = normalizeTestcaseName(o.name);
+              if (o && typeof o.idx === 'number' && o.idx >= 0) selectedId = 'tc-' + o.idx;
+            } catch {
+              selectedTestcaseName = normalizeTestcaseName(saved);
+            }
+          }
+        } catch {}
+      }
+
+      function indexForTestcaseName(testCases, name) {
+        if (!name || !testCases || !testCases.length) return -1;
+        const want = normalizeTestcaseName(name);
+        const exact = testCases.findIndex((t) => normalizeTestcaseName(t.testcaseName) === want);
+        if (exact >= 0) return exact;
+        const lower = want.toLowerCase();
+        return testCases.findIndex((t) => normalizeTestcaseName(t.testcaseName).toLowerCase() === lower);
+      }
+
+      function resolveSelectedTestcase(testCases) {
+        if (!testCases || !testCases.length) return { t: null, idx: -1 };
+        restoreSelectedTestcaseName(testCases);
+
+        if (selectedId) {
+          const idx = parseInt(String(selectedId).replace('tc-', ''), 10);
+          if (!isNaN(idx) && idx >= 0 && idx < testCases.length) {
+            const t = testCases[idx];
+            selectedTestcaseName = normalizeTestcaseName(t.testcaseName);
+            return { t, idx };
+          }
+        }
+
+        if (selectedTestcaseName) {
+          const idx = indexForTestcaseName(testCases, selectedTestcaseName);
+          if (idx >= 0) {
+            selectedId = 'tc-' + idx;
+            return { t: testCases[idx], idx };
+          }
+          return { t: null, idx: -1 };
+        }
+
+        selectedId = 'tc-0';
+        selectedTestcaseName = normalizeTestcaseName(testCases[0].testcaseName);
+        saveSelectedTestcase(selectedTestcaseName, 0);
+        return { t: testCases[0], idx: 0 };
+      }
+
+      /**
+       * Content fingerprint for the open case detail panel.
+       * Suite-level polls that only change other cases must not remount this panel (resets video playback).
+       */
+      function testcasePanelSignature(t) {
+        if (!t) return '';
+        const steps = Array.isArray(t.testSteps) ? t.testSteps : [];
+        const stepSig = steps.map((s) => {
+          const shots = Array.isArray(s.screenshots) ? s.screenshots.join('|') : '';
+          const files = Array.isArray(s.attachedFiles)
+            ? s.attachedFiles.map((f) => (f && (f.name || f.path || f.url)) || '').join('|')
+            : '';
+          return [
+            s.teststepName || '',
+            s.stepType || '',
+            s.status || '',
+            s.startTime || '',
+            s.endTime || '',
+            s.errorMessage || '',
+            s.expected || '',
+            s.actual || '',
+            s.testdata || '',
+            s.prereq || '',
+            shots,
+            files,
+            Array.isArray(s.logs) ? s.logs.join('|') : '',
+          ].join('~');
+        }).join('||');
+        const videos = Array.isArray(t.videos) ? t.videos.join('|') : '';
+        const tags = Array.isArray(t.tags) ? t.tags.join('|') : '';
+        const caseLogs = Array.isArray(t.logs) ? String(t.logs.length) + ':' + t.logs[t.logs.length - 1] : '';
+        return [
+          testcaseKey(t),
+          t.status || '',
+          t.startTime || '',
+          t.endTime || '',
+          t.failureReason || '',
+          t.description || '',
+          t.executionMachine || '',
+          tags,
+          videos,
+          caseLogs,
+          String(steps.length),
+          stepSig,
+        ].join('##');
+      }
+
+      function suiteSelectedTags() {
+        return Object.keys(suiteAdvSelectedTags).filter((k) => suiteAdvSelectedTags[k]);
+      }
+
+      function sidebarItemMatchesFilters(it) {
+        const nm = (it.querySelector('.sidebar-item-name') || {}).textContent || '';
+        const st = it.getAttribute('data-status') || '';
+        const tags = String(it.getAttribute('data-tags') || '')
+          .split('|')
+          .map((t) => t.trim())
+          .filter(Boolean);
+        if (!suiteStatusFilters[st]) return false;
+        const wantTags = suiteSelectedTags();
+        if (wantTags.length && !wantTags.some((tg) => tags.includes(tg))) return false;
+        const q = currentSearch.trim().toLowerCase();
+        if (q) {
+          const hay = (nm + ' ' + tags.join(' ')).toLowerCase();
+          if (!hay.includes(q)) return false;
+        }
+        return true;
+      }
+
+      function applySidebarFilters() {
+        let visible = 0;
+        document.querySelectorAll('#sidebar-list .sidebar-item').forEach((it) => {
+          const show = sidebarItemMatchesFilters(it);
+          it.style.display = show ? 'block' : 'none';
+          if (show) visible++;
+        });
+        const statusEl = document.getElementById('suite-adv-filter-status');
+        if (statusEl) {
+          const active =
+            suiteSelectedTags().length ||
+            !suiteStatusFilters.passed ||
+            !suiteStatusFilters.failed ||
+            !suiteStatusFilters.skipped ||
+            !suiteStatusFilters.in_progress ||
+            currentSearch.trim();
+          statusEl.textContent = active
+            ? visible + ' testcase' + (visible === 1 ? '' : 's') + ' shown'
+            : '';
+        }
+      }
+
+      function renderSuiteTagCloud() {
+        const cloud = document.getElementById('suite-adv-tag-cloud');
+        if (!cloud) return;
+        const tc = (latestData && latestData.testSuite && latestData.testSuite.testCases) || [];
+        const seen = {};
+        const tags = [];
+        tc.forEach((row) => {
+          (row.tags || []).forEach((tg) => {
+            const t = String(tg || '').trim();
+            if (t && !seen[t]) {
+              seen[t] = 1;
+              tags.push(t);
+            }
+          });
+        });
+        tags.sort((a, b) => a.localeCompare(b));
+        if (!tags.length) {
+          cloud.innerHTML = '<span class="suite-adv-tag-empty">No tags in this run yet.</span>';
+          if (typeof mervRefreshTagCollapse === 'function') {
+            const shell = cloud.closest('.merv-tags-shell');
+            if (shell) mervRefreshTagCollapse(shell);
+          }
+          return;
+        }
+        cloud.innerHTML = tags
+          .map((tg) => {
+            const on = !!suiteAdvSelectedTags[tg];
+            return (
+              '<button type="button" class="suite-adv-tag-pill' +
+              (on ? ' selected' : '') +
+              '" data-tag="' +
+              escHtml(tg) +
+              '">' +
+              escHtml(tg) +
+              '</button>'
+            );
+          })
+          .join('');
+        cloud.querySelectorAll('.suite-adv-tag-pill').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const tv = btn.getAttribute('data-tag') || '';
+            if (!tv) return;
+            suiteAdvSelectedTags[tv] = !suiteAdvSelectedTags[tv];
+            renderSuiteTagCloud();
+            applySidebarFilters();
+          });
+        });
+        if (typeof mervRefreshTagCollapse === 'function') {
+          const shell = cloud.closest('.merv-tags-shell');
+          if (shell) mervRefreshTagCollapse(shell);
+        }
+      }
+
+      function syncStatusFromFilter() {
+        const f = currentFilter || 'all';
+        suiteStatusFilters.passed = f === 'all' || f === 'passed';
+        suiteStatusFilters.failed = f === 'all' || f === 'failed';
+        suiteStatusFilters.skipped = f === 'all' || f === 'skipped';
+        suiteStatusFilters.in_progress = f === 'all';
+      }
+
+      window.filterByStatus = function (st) {
+        currentFilter = st || 'all';
+        document.querySelectorAll('.sidebar-filters .filter-btn').forEach((b) => {
+          b.classList.toggle('active', (b.getAttribute('data-status') || '') === currentFilter);
+        });
+        syncStatusFromFilter();
+        applySidebarFilters();
+      };
+
+      function clearSuiteFilters() {
+        Object.keys(suiteAdvSelectedTags).forEach((k) => delete suiteAdvSelectedTags[k]);
+        currentFilter = 'all';
+        document.querySelectorAll('.sidebar-filters .filter-btn').forEach((b) => {
+          b.classList.toggle('active', (b.getAttribute('data-status') || '') === 'all');
+        });
+        syncStatusFromFilter();
+        const inp = document.getElementById('testcase-search');
+        if (inp) inp.value = '';
+        currentSearch = '';
+        renderSuiteTagCloud();
+        applySidebarFilters();
+      }
+
+      function setSuiteTagPanelOpen(open) {
+        const panel = document.getElementById('suite-tag-panel');
+        const btn = document.getElementById('sidebar-filter-btn');
+        if (!panel || !btn) return;
+        panel.hidden = !open;
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        try {
+          localStorage.setItem(SUITE_TAG_PANEL_KEY, open ? '1' : '0');
+        } catch {}
+        if (open) renderSuiteTagCloud();
+      }
+
+      function initSuiteFilters() {
+        syncStatusFromFilter();
+        let tagOpen = false;
+        try {
+          tagOpen = localStorage.getItem(SUITE_TAG_PANEL_KEY) === '1';
+        } catch {}
+        setSuiteTagPanelOpen(tagOpen);
+        const filterBtn = document.getElementById('sidebar-filter-btn');
+        if (filterBtn) {
+          filterBtn.addEventListener('click', () => {
+            const panel = document.getElementById('suite-tag-panel');
+            setSuiteTagPanelOpen(panel && panel.hidden);
+          });
+        }
+        document.querySelectorAll('.sidebar-filters .filter-btn').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            window.filterByStatus(btn.getAttribute('data-status') || 'all');
+          });
+        });
+        const clearBtn = document.getElementById('suite-adv-clear');
+        if (clearBtn) clearBtn.addEventListener('click', clearSuiteFilters);
+        const searchInp = document.getElementById('testcase-search');
+        if (searchInp) {
+          searchInp.addEventListener('input', (ev) => {
+            currentSearch = String(ev.target.value || '').toLowerCase();
+            applySidebarFilters();
+          });
+        }
+      }
+
+      window.filterShowAllTestCases = function () {
+        clearSuiteFilters();
+        return false;
+      };
+
+      function drawPieChart(passed, failed, skipped) {
+        const canvas = document.getElementById('pieChart');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+        const w = canvas.width,
+          h = canvas.height;
+        const cx = w / 2,
+          cy = h / 2;
+        const r = Math.min(w, h) * 0.36;
+        ctx.clearRect(0, 0, w, h);
+        const total = passed + failed + skipped;
+        if (total === 0) {
+          ctx.fillStyle = '#eee';
+          ctx.beginPath();
+          ctx.arc(cx, cy, r, 0, 2 * Math.PI);
+          ctx.fill();
+          return;
+        }
+        let start = -Math.PI / 2;
+        const pa = (passed / total) * 2 * Math.PI;
+        const fa = (failed / total) * 2 * Math.PI;
+        const ka = (skipped / total) * 2 * Math.PI;
+        if (passed) {
+          ctx.beginPath();
+          ctx.moveTo(cx, cy);
+          ctx.arc(cx, cy, r, start, start + pa);
+          ctx.closePath();
+          ctx.fillStyle = '#4CAF50';
+          ctx.fill();
+          start += pa;
+        }
+        if (failed) {
+          ctx.beginPath();
+          ctx.moveTo(cx, cy);
+          ctx.arc(cx, cy, r, start, start + fa);
+          ctx.closePath();
+          ctx.fillStyle = '#f44336';
+          ctx.fill();
+          start += fa;
+        }
+        if (skipped) {
+          ctx.beginPath();
+          ctx.moveTo(cx, cy);
+          ctx.arc(cx, cy, r, start, start + ka);
+          ctx.closePath();
+          ctx.fillStyle = '#FF9800';
+          ctx.fill();
+        }
+      }
+
+      function scrollToTestcasePanel() {
+        const tc = document.getElementById('testcase-content');
+        if (!tc) return;
+        try {
+          tc.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } catch {
+          tc.scrollIntoView(true);
+        }
+        try {
+          const top = window.pageYOffset + tc.getBoundingClientRect().top - 16;
+          window.scrollTo({ top, behavior: 'smooth' });
+        } catch {
+          window.scrollTo(0, window.pageYOffset + tc.getBoundingClientRect().top - 16);
+        }
+        const ca = document.querySelector('.content-area');
+        if (ca && ca.scrollHeight > ca.clientHeight) {
+          const y = Math.max(0, tc.offsetTop - 16);
+          try {
+            ca.scrollTo({ top: y, behavior: 'smooth' });
+          } catch {
+            ca.scrollTop = y;
+          }
+        }
+      }
+
+      function updateFailureJsonLink(failCount, running) {
+        const link = document.getElementById('failure-json-link');
+        if (!link) return;
+        const n = Number(failCount) || 0;
+        const ts = running ? `?ts=${Date.now()}` : '';
+        link.href = running ? `../json/failure-test.json${ts}` : `../failure-test.json${ts}`;
+        link.textContent = n ? `Failures JSON (${n})` : 'Failures JSON (0)';
+        link.classList.toggle('is-empty', n === 0);
+        link.hidden = false;
+        link.setAttribute(
+          'title',
+          n
+            ? `Open failure-test.json — ${n} failed testcase${n === 1 ? '' : 's'} with TEST_DATA steps`
+            : 'No failures in this run yet',
+        );
+      }
+
+      function isFailedStatus(status) {
+        return String(status || '').toUpperCase() === 'FAILED';
+      }
+      function stepFailureLine(step) {
+        if (!step || !isFailedStatus(step.status)) return '';
+        const msg = formatErrorTextForDisplay(step.errorMessage || step.actual || '').trim();
+        const name = String(step.teststepName || '').trim();
+        if (msg && name) return name + ': ' + msg;
+        if (msg) return msg;
+        if (name) return 'Step "' + name + '" failed';
+        return '';
+      }
+      function collectTestcaseFailureMessages(tc) {
+        const fromSteps = [];
+        const seen = new Set();
+        (tc.testSteps || []).forEach((s) => {
+          const line = stepFailureLine(s);
+          if (!line || seen.has(line)) return;
+          seen.add(line);
+          fromSteps.push(line);
+        });
+        if (fromSteps.length) return fromSteps;
+        const fr = formatErrorTextForDisplay(tc.failureReason || '').trim();
+        if (!fr) return ['(No failure message)'];
+        if (fr.indexOf('\n\n') >= 0) {
+          return fr.split(/\n\n+/).map((x) => x.trim()).filter(Boolean);
+        }
+        return [fr];
+      }
+      function testcaseFailureDisplayText(tc) {
+        return collectTestcaseFailureMessages(tc).join('\n\n');
+      }
+
+      let lastFailurePanelSig = '';
+      function maybeRenderFailureReasons(testCases) {
+        const sig = (testCases || [])
+          .filter((t) => String(t.status || '').toUpperCase() === 'FAILED')
+          .map((t) => testcaseKey(t) + '|' + collectTestcaseFailureMessages(t).map(failureReasonGroupingKey).join('|'))
+          .join('\n');
+        if (sig === lastFailurePanelSig) return;
+        lastFailurePanelSig = sig;
+        renderFailureReasons(testCases);
+      }
+
+      function renderFailureReasons(testCases) {
+        const panel = document.getElementById('failure-reasons-panel');
+        if (!panel) return;
+        const groups = {};
+        (testCases || []).forEach((t, i) => {
+          if (String(t.status || '').toUpperCase() !== 'FAILED') return;
+          const reasons = collectTestcaseFailureMessages(t);
+          let firstShot = '';
+          const steps = t.testSteps || [];
+          for (let si = 0; si < steps.length && !firstShot; si++) {
+            const ss = (steps[si] && steps[si].screenshots) || [];
+            if (ss.length) firstShot = String(ss[0] || '');
+          }
+          reasons.forEach((r) => {
+            const key = failureReasonGroupingKey(r);
+            if (!groups[key]) groups[key] = [];
+            groups[key].push({
+              id: 'tc-' + i,
+              idx: i,
+              name: String(t.testcaseName || 'Test case ' + (i + 1)),
+              shot: firstShot,
+            });
+          });
+        });
+        const keys = Object.keys(groups).sort((a, b) => groups[b].length - groups[a].length);
+        let h = '<h3>Failure reasons</h3>';
+        if (!keys.length) {
+          h += '<p class="failure-reason-empty">No failures yet.</p>';
+        } else {
+          keys.forEach((k, gi) => {
+            const arr = groups[k] || [];
+            const gid = 'fail-grp-' + gi;
+            h += '<div class="failure-reason-group" id="' + escHtml(gid) + '">';
+            h +=
+              '<div class="failure-reason-row" role="button" tabindex="0" data-fail-grp="' +
+              escHtml(gid) +
+              '" title="Click to show or hide failed test cases">';
+            h += '<span class="failure-reason-caret" aria-hidden="true">&#9654;</span>';
+            h += '<span class="failure-reason-text">' + escHtml(k) + '</span>';
+            h += '<span class="failure-reason-count">' + arr.length + '</span>';
+            h += '</div><div class="failure-related-cases">';
+            arr.forEach((ca) => {
+              h +=
+                '<div class="failure-case-item"><button type="button" class="failure-case-link" data-testcase-key="' +
+                escHtml(ca.name) +
+                '" data-tc-idx="' +
+                escHtml(String(ca.idx)) +
+                '">' +
+                escHtml(ca.name) +
+                '</button>';
+              if (ca.shot) {
+                const sp = screenshotSrcForHtml(ca.shot);
+                h +=
+                  '<img class="failure-case-thumb" src="' +
+                  escHtml(sp) +
+                  '" alt="Screenshot" onclick="window.open(this.src,\'_blank\')">';
+              }
+              h += '</div>';
+            });
+            h += '</div></div>';
+          });
+        }
+        panel.innerHTML = h;
+        panel.querySelectorAll('.failure-reason-row[data-fail-grp]').forEach((row) => {
+          const toggle = () => {
+            const id = row.getAttribute('data-fail-grp');
+            const grp = id ? document.getElementById(id) : null;
+            if (grp) grp.classList.toggle('open');
+          };
+          row.addEventListener('click', toggle);
+          row.addEventListener('keydown', (ev) => {
+            if (ev.key === 'Enter' || ev.key === ' ') {
+              ev.preventDefault();
+              toggle();
+            }
+          });
+        });
+        panel.querySelectorAll('.failure-case-link[data-testcase-key]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const tcIdx = parseInt(btn.getAttribute('data-tc-idx') || '', 10);
+            saveSelectedTestcase(
+              btn.getAttribute('data-testcase-key') || '',
+              isNaN(tcIdx) ? undefined : tcIdx,
+            );
+            const tc = (latestData && latestData.testSuite && latestData.testSuite.testCases) || [];
+            syncSelectedCasePanel(tc);
+            syncSidebar(tc);
+            setTimeout(scrollToTestcasePanel, 0);
+          });
+        });
+      }
+
+
+      function testcaseKey(t) {
+        return normalizeTestcaseName((t && t.testcaseName) || '');
+      }
+
+      function setElHidden(el, hidden) {
+        if (!el) return;
+        el.style.display = hidden ? 'none' : '';
+      }
+
+      function updateSidebarActiveClasses() {
+        document.querySelectorAll('#sidebar-list .sidebar-item').forEach((it) => {
+          const key = it.getAttribute('data-testcase-key') || '';
+          const idx = it.getAttribute('data-tc-idx');
+          const byName = !!(selectedTestcaseName && key === selectedTestcaseName);
+          const byIdx = !!(selectedId && idx != null && selectedId === 'tc-' + idx);
+          it.classList.toggle('active', byName || byIdx);
+        });
+      }
+
+      function patchSidebarItem(el, t, idx, active) {
+        const cls = statusClass(t.status);
+        const tg = statusTag(t.status);
+        const nm = String(t.testcaseName || 'N/A');
+        const isActive =
+          active === true ||
+          (!!selectedTestcaseName && testcaseKey(t) === selectedTestcaseName) ||
+          (!!selectedId && selectedId === 'tc-' + idx);
+        el.className = 'sidebar-item ' + cls + (isActive ? ' active' : '');
+        el.setAttribute('data-tc-idx', String(idx));
+        el.setAttribute('data-status', cls);
+        el.setAttribute('data-testcase-key', testcaseKey(t));
+        el.setAttribute(
+          'data-tags',
+          (Array.isArray(t.tags) ? t.tags : [])
+            .map((tag) => String(tag || '').trim())
+            .filter(Boolean)
+            .join('|'),
+        );
+        const nameEl = el.querySelector('.sidebar-item-name');
+        if (nameEl && nameEl.textContent !== nm) nameEl.textContent = nm;
+        const tagEl = el.querySelector('.sidebar-status-tag');
+        if (tagEl) {
+          tagEl.className = 'sidebar-status-tag ' + tg.cls;
+          tagEl.textContent = tg.txt;
+        }
+        let tagsWrap = el.querySelector('.sidebar-item-tags');
+        const caseTags = Array.isArray(t.tags) ? t.tags.filter(Boolean) : [];
+        if (caseTags.length) {
+          const tagsHtml = caseTags
+            .map((tag) => '<span class="sidebar-item-tag">' + escHtml(String(tag)) + '</span>')
+            .join('');
+          if (!tagsWrap) {
+            tagsWrap = document.createElement('div');
+            tagsWrap.className = 'sidebar-item-tags';
+            el.appendChild(tagsWrap);
+          }
+          if (tagsWrap.innerHTML !== tagsHtml) tagsWrap.innerHTML = tagsHtml;
+          setElHidden(tagsWrap, false);
+        } else if (tagsWrap) setElHidden(tagsWrap, true);
+      }
+
+      function createSidebarItem(t, idx) {
+        const el = document.createElement('div');
+        el.innerHTML =
+          '<div class="sidebar-item-top"><div class="sidebar-item-name"></div><span class="sidebar-status-tag"></span></div>';
+        patchSidebarItem(el, t, idx, false);
+        return el;
+      }
+
+      function syncSidebar(testCases) {
+        const root = document.getElementById('sidebar-list');
+        if (!root) return;
+        const sideScroll = root.scrollTop;
+        restoreSelectedTestcaseName(testCases || []);
+        const byIdx = new Map();
+        root.querySelectorAll('.sidebar-item[data-tc-idx]').forEach((el) => {
+          byIdx.set(el.getAttribute('data-tc-idx'), el);
+        });
+        (testCases || []).forEach((t, i) => {
+          const idxKey = String(i);
+          let el = byIdx.get(idxKey);
+          if (!el) {
+            el = createSidebarItem(t, i);
+            byIdx.set(idxKey, el);
+          } else {
+            patchSidebarItem(el, t, i);
+          }
+          root.appendChild(el);
+        });
+        updateSidebarActiveClasses();
+        root.scrollTop = sideScroll;
+        applySidebarFilters();
+      }
+
+      function fmtDurMs(ms) {
+        if (ms == null || ms < 0 || isNaN(ms)) return '—';
+        const min = Math.floor(ms / 60000);
+        const sec = Math.floor((ms % 60000) / 1000);
+        const msec = Math.floor(ms % 1000);
+        return `${min}m:${sec}s:${msec}ms`;
+      }
+
+      function isSafeImageSrc(src) {
+        if (!src) return false;
+        const s = String(src).trim().replace(/\s+/g, '');
+        if (/^data:image\/[a-z0-9.+-]+;base64,[a-z0-9+/=]+$/i.test(s)) return true;
+        if (/^https?:\/\//i.test(s)) return true;
+        if (s.charAt(0) === '/' && s.charAt(1) !== '/') return true;
+        return false;
+      }
+      /** Render text, but show embedded HTML images instead of dumping base64. */
+      function richTextHtml(raw) {
+        const s = stripAnsi(String(raw || ''));
+        if (!/<\s*img\b/i.test(s) && !/&lt;\s*img\b/i.test(s)) return escHtml(s);
+        const decoded = s
+          .replace(/&lt;/g, '<')
+          .replace(/&gt;/g, '>')
+          .replace(/&quot;/g, '"')
+          .replace(/&#39;/g, "'")
+          .replace(/&amp;/g, '&');
+        const re = /<\s*img\b[^>]*>/gi;
+        let html = '';
+        let last = 0;
+        let m;
+        while ((m = re.exec(decoded))) {
+          html += escHtml(decoded.slice(last, m.index).replace(/<[^>]+>/g, ''));
+          const srcM = m[0].match(/\bsrc\s*=\s*(?:"([^"]+)"|'([^']+)'|([^\s>]+))/i);
+          const src = srcM ? String(srcM[1] || srcM[2] || srcM[3] || '').replace(/\s+/g, '') : '';
+          if (isSafeImageSrc(src)) {
+            html += '<img class="merv-inline-image" src="' + escHtml(src) + '" alt="Image">';
+          }
+          last = m.index + m[0].length;
+        }
+        html += escHtml(decoded.slice(last).replace(/<[^>]+>/g, ''));
+        return html;
+      }
+      /** Same fields as Java {@code addMetaRows} (Expected, Actual, Data, Info). */
+      function prettyJsonText(raw) {
+        const s = String(raw == null ? '' : raw).trim();
+        if (!s || s === '(none)' || s === '(empty)') return s || '(none)';
+        if (
+          (s.charAt(0) === '{' && s.charAt(s.length - 1) === '}')
+          || (s.charAt(0) === '[' && s.charAt(s.length - 1) === ']')
+        ) {
+          try {
+            return JSON.stringify(JSON.parse(s), null, 2);
+          } catch (e) {
+            /* keep */
+          }
+        }
+        return String(raw);
+      }
+
+      function formatHeadersText(headers) {
+        if (headers == null) return '(none)';
+        if (typeof headers === 'string') {
+          const t = headers.trim();
+          return t ? prettyJsonText(t) : '(none)';
+        }
+        if (typeof headers === 'object') {
+          const keys = Object.keys(headers);
+          if (!keys.length) return '(none)';
+          try {
+            return JSON.stringify(headers, null, 2);
+          } catch (e) {
+            return String(headers);
+          }
+        }
+        return String(headers);
+      }
+
+      function parseMervApiCallData(raw) {
+        if (raw == null) return null;
+        const s = String(raw).trim();
+        if (!s) return null;
+        if (s.charAt(0) === '{') {
+          try {
+            const obj = JSON.parse(s);
+            if (obj && (obj.__mervApiCall || obj.method || obj.url) && (obj.responseBody != null || obj.statusCode != null || obj.payload != null)) {
+              return {
+                method: obj.method || '',
+                url: obj.url || '',
+                requestHeaders: obj.requestHeaders || {},
+                payload: obj.payload != null ? String(obj.payload) : '(none)',
+                statusCode: obj.statusCode,
+                responseHeaders: obj.responseHeaders || {},
+                responseBody: obj.responseBody != null ? String(obj.responseBody) : '(none)',
+                error: obj.error || null,
+              };
+            }
+          } catch (e) {
+            /* fall through to plain-text parser */
+          }
+        }
+        if (!/Request/i.test(s) || !/Response/i.test(s)) return null;
+        function grab(label) {
+          const re = new RegExp(
+            label + '\\s*-\\s*([\\s\\S]*?)(?=(?:\\n\\s*(?:Url|Method|Header|Payload|Status Code|Response Header|Response Body|Error)\\s*-)|$)',
+            'i',
+          );
+          const m = s.match(re);
+          return m ? String(m[1]).trim() : '';
+        }
+        if (!/Url\s*-/i.test(s) && !/Method\s*-/i.test(s)) return null;
+        return {
+          method: grab('Method'),
+          url: grab('(?:Request\\s+)?Url'),
+          requestHeaders: grab('Header'),
+          payload: grab('Payload'),
+          statusCode: grab('Status Code'),
+          responseHeaders: grab('Response Header'),
+          responseBody: grab('Response Body'),
+          error: grab('Error') || null,
+        };
+      }
+
+      function mervApiCollapsibleBlock(text, preferCollapse) {
+        const full = prettyJsonText(text);
+        const lines = String(full).split('\n');
+        const collapse = preferCollapse && lines.length > 6;
+        const preview = collapse ? lines.slice(0, 6).join('\n') : full;
+        let html =
+          '<pre class="merv-api-pre-wrap' +
+          (collapse ? ' is-collapsed' : '') +
+          '">' +
+          escHtml(preview) +
+          '</pre>';
+        if (collapse) {
+          html +=
+            '<pre class="merv-api-full-src" hidden>' +
+            escHtml(full) +
+            '</pre>' +
+            '<button type="button" class="merv-api-show-full" data-merv-expanded="0">Show full</button>';
+        }
+        return html;
+      }
+
+      function mervApiCallHtml(api) {
+        const method = String(api.method || '').toUpperCase() || '(unknown)';
+        const statusRaw = api.statusCode;
+        const statusNum = statusRaw == null || statusRaw === '' ? null : Number(statusRaw);
+        const statusLabel = statusRaw == null || statusRaw === '' ? '(none)' : String(statusRaw);
+        const statusBad =
+          statusNum != null && !Number.isNaN(statusNum) && (statusNum < 200 || statusNum >= 400);
+        const reqHeaders = formatHeadersText(api.requestHeaders);
+        const resHeaders = formatHeadersText(api.responseHeaders);
+        const payload = api.payload == null || api.payload === '' ? '(none)' : String(api.payload);
+        const body = api.responseBody == null || api.responseBody === '' ? '(none)' : String(api.responseBody);
+
+        function row(section, key, valHtml) {
+          return (
+            '<div class="merv-api-row">' +
+            '<div class="merv-api-key">' +
+            escHtml(key) +
+            '</div>' +
+            '<div class="merv-api-val">' +
+            valHtml +
+            '</div></div>'
+          );
+        }
+
+        let html = '<div class="merv-api-card">';
+        html += '<div class="merv-api-section merv-api-section--request">';
+        html += '<div class="merv-api-section-title">Request</div>';
+        html += '<div class="merv-api-rows">';
+        html += row('request', 'Request URL', '<span class="merv-api-val-plain">' + escHtml(api.url || '(unknown)') + '</span>');
+        html += row(
+          'request',
+          'Method',
+          '<span class="merv-api-method">' + escHtml(method) + '</span>',
+        );
+        html += row('request', 'Header', mervApiCollapsibleBlock(reqHeaders, true));
+        html += row('request', 'Payload', mervApiCollapsibleBlock(payload, true));
+        html += '</div></div>';
+
+        html += '<div class="merv-api-section merv-api-section--response">';
+        html += '<div class="merv-api-section-title">Response</div>';
+        html += '<div class="merv-api-rows">';
+        html += row(
+          'response',
+          'Status Code',
+          '<span class="merv-api-status' +
+            (statusBad ? ' is-error' : '') +
+            '">' +
+            escHtml(statusLabel) +
+            '</span>',
+        );
+        html += row('response', 'Header', mervApiCollapsibleBlock(resHeaders, true));
+        html += row('response', 'Response Body', mervApiCollapsibleBlock(body, true));
+        if (api.error) {
+          html += row(
+            'response',
+            'Error',
+            '<span class="merv-api-val-plain">' + escHtml(String(api.error)) + '</span>',
+          );
+        }
+        html += '</div></div></div>';
+        return html;
+      }
+
+      function stepMetaHtml(stp) {
+        const rows = [];
+        function row(label, val, showLabel) {
+          if (val == null) return;
+          const str = stripAnsi(String(val));
+          if (!str.trim()) return;
+          const api = showLabel === false ? parseMervApiCallData(str) : null;
+          if (api) {
+            rows.push(
+              '<div class="step-meta-row"><div class="step-meta-val" style="flex-basis:100%">' +
+                mervApiCallHtml(api) +
+                '</div></div>',
+            );
+            return;
+          }
+          const key =
+            showLabel === false
+              ? ''
+              : '<div class="step-meta-key">' + escHtml(label) + '</div>';
+          rows.push(
+            '<div class="step-meta-row">' +
+              key +
+              '<div class="step-meta-val">' +
+              richTextHtml(str) +
+              '</div></div>',
+          );
+        }
+        row('Expected', stp.expected, true);
+        row('Actual', stp.actual, true);
+        const hasFiles = stp.attachedFiles && stp.attachedFiles.length;
+        if (!hasFiles) row('Data', stp.testdata, false);
+        row('Info', stp.prereq, true);
+        return rows.length ? '<div class="step-meta">' + rows.join('') + '</div>' : '';
+      }
+
+      function buildCasePanelShell() {
+        const root = document.createElement('div');
+        root.id = 'merv-live-case-root';
+        root.innerHTML =
+          '<div class="testcase-heading"><h3 class="testcase-title"></h3><span class="testcase-status-chip"></span></div>' +
+          '<p class="testcase-desc"></p>' +
+          '<div class="testcase-meta-grid">' +
+          '<div class="testcase-meta-item"><span class="testcase-meta-label">Status</span><span class="testcase-meta-value merv-meta-status"></span></div>' +
+          '<div class="testcase-meta-item"><span class="testcase-meta-label">Total time taken</span><span class="testcase-meta-value merv-meta-dur"></span></div>' +
+          '<div class="testcase-meta-item"><span class="testcase-meta-label">Executed on machine</span><span class="testcase-meta-value merv-meta-machine"></span></div>' +
+          '</div>' +
+          '<p class="testcase-tags-label" style="margin:0 0 6px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6b7280">Tags</p>' +
+          '<div class="merv-tags-shell merv-tags-collapsed" data-merv-tag-rows="3" data-merv-tag-row-px="20" data-merv-tag-gap-px="8">' +
+          '<div class="testcase-tags merv-case-tags"></div></div>' +
+          '<div class="merv-case-failure"></div>' +
+          '<h4 class="merv-steps-heading">Test Steps:</h4>' +
+          '<div id="merv-steps-list"></div>' +
+          '<div class="merv-case-logs-block" style="display:none">' +
+          '<h4 class="merv-case-logs-heading">Logs:</h4>' +
+          '<div class="merv-case-logs log-container"></div></div>' +
+          '<div class="merv-case-videos" style="display:none"></div>';
+        return root;
+      }
+
+      function stepShotKey(caseId, stepIdx) {
+        return String(caseId || '') + '|' + String(stepIdx == null ? '' : stepIdx);
+      }
+
+      function restoreOpenStepScreenshots() {
+        const root = document.getElementById('testcase-content');
+        if (!root || !selectedId) return;
+        root.querySelectorAll('.test-step[data-step-idx]').forEach((stepEl) => {
+          const idx = stepEl.getAttribute('data-step-idx');
+          if (idx == null) return;
+          if (!openStepShots[stepShotKey(selectedId, idx)]) return;
+          const shots = stepEl.querySelector('.step-screenshots');
+          const title = stepEl.querySelector('.test-step-title');
+          if (shots) shots.classList.add('open');
+          if (title) title.classList.add('shots-open');
+        });
+      }
+
+      function toggleStepScreenshots(titleEl) {
+        const step = titleEl.closest('.test-step');
+        if (!step) return;
+        const shots = step.querySelector('.step-screenshots');
+        if (!shots) return;
+        const idx = step.getAttribute('data-step-idx');
+        shots.classList.toggle('open');
+        const open = shots.classList.contains('open');
+        const title = step.querySelector('.test-step-title');
+        if (title) title.classList.toggle('shots-open', open);
+        const key = stepShotKey(selectedId, idx);
+        if (open) openStepShots[key] = true;
+        else delete openStepShots[key];
+      }
+
+      function stepShotClickTarget(el) {
+        if (!el || !el.closest) return null;
+        if (
+          el.closest(
+            'a,button,input,textarea,select,.step-screenshots img,.step-screenshots video,.merv-zoomable-image,.testdata-image-file-preview,.merv-api-show-full,.merv-api-card',
+          )
+        )
+          return null;
+        const step = el.closest('.test-step[data-step-idx]');
+        if (!step || !step.querySelector('.step-screenshots')) return null;
+        const hd = el.closest('.test-step-hd.has-shot-hd');
+        if (!hd || !step.contains(hd)) return null;
+        return step.querySelector('.test-step-title') || hd;
+      }
+
+      function initStepScreenshotClicks() {
+        const root = document.getElementById('testcase-content');
+        if (!root || root.dataset.mervShotClick) return;
+        root.dataset.mervShotClick = '1';
+        root.addEventListener('click', (ev) => {
+          const btn = ev.target && ev.target.closest && ev.target.closest('.merv-api-show-full');
+          if (btn && root.contains(btn)) {
+            ev.preventDefault();
+            ev.stopPropagation();
+            const wrap = btn.parentElement;
+            const pre = wrap && wrap.querySelector('.merv-api-pre-wrap');
+            const fullSrc = wrap && wrap.querySelector('.merv-api-full-src');
+            if (!pre || !fullSrc) return;
+            const expanded = btn.getAttribute('data-merv-expanded') === '1';
+            if (expanded) {
+              const lines = String(fullSrc.textContent || '').split('\n');
+              pre.textContent = lines.slice(0, 6).join('\n');
+              pre.classList.add('is-collapsed');
+              btn.setAttribute('data-merv-expanded', '0');
+              btn.textContent = 'Show full';
+            } else {
+              pre.textContent = fullSrc.textContent || '';
+              pre.classList.remove('is-collapsed');
+              btn.setAttribute('data-merv-expanded', '1');
+              btn.textContent = 'Show less';
+            }
+            return;
+          }
+          const t = stepShotClickTarget(ev.target);
+          if (!t) return;
+          ev.preventDefault();
+          toggleStepScreenshots(t);
+        });
+        root.addEventListener('keydown', (ev) => {
+          if (ev.key !== 'Enter' && ev.key !== ' ') return;
+          const t = stepShotClickTarget(ev.target);
+          if (!t) return;
+          ev.preventDefault();
+          toggleStepScreenshots(t);
+        });
+      }
+
+      function isVideoMediaPath(stored) {
+        return /\.(webm|mp4|ogg|mov)(\?|#|$)/i.test(String(stored || ''));
+      }
+      function logLineClass(line) {
+        const s = String(line || '');
+        if (/\bERROR\b/.test(s)) return 'log-error';
+        if (/\bWARN\b/.test(s)) return 'log-warn';
+        if (/\bDEBUG\b/.test(s)) return 'log-debug';
+        if (/\bTRACE\b/.test(s)) return 'log-trace';
+        return 'log-info';
+      }
+
+      function logsSectionHtml(lines, title) {
+        const list = Array.isArray(lines) ? lines.filter((x) => String(x || '').trim()) : [];
+        if (!list.length) return '';
+        return (
+          '<div class="step-logs">' +
+          '<p><strong>' +
+          escHtml(title || 'Execution Logs') +
+          ':</strong></p>' +
+          '<div class="log-container">' +
+          list
+            .map(
+              (line) =>
+                '<div class="log-line ' +
+                logLineClass(line) +
+                '">' +
+                escHtml(String(line)) +
+                '</div>',
+            )
+            .join('') +
+          '</div></div>'
+        );
+      }
+
+      function mediaHtmlForStepPath(ss) {
+        const p = screenshotSrcForHtml(ss);
+        if (isVideoMediaPath(ss) || isVideoMediaPath(p)) {
+          return (
+            '<div class="screenshot"><video controls preload="metadata" src="' +
+            escHtml(p) +
+            '"></video></div>'
+          );
+        }
+        return (
+          '<div class="screenshot"><img src="' +
+          escHtml(p) +
+          '" alt="Screenshot" onclick="window.open(this.src,\'_blank\')"></div>'
+        );
+      }
+      function patchStepElement(el, stp) {
+        const sc = statusClass(stp.status);
+        const stTag = statusTag(stp.status);
+        const typeLbl = String(stp.stepType || 'STEP').replace(/_/g, ' ');
+        el.className = 'test-step ' + sc;
+        const hd = el.querySelector('.test-step-hd');
+        const titleEl = el.querySelector('.test-step-title');
+        const shots = stp.screenshots || [];
+        const hasShots = shots.length > 0;
+        if (hd) hd.classList.toggle('has-shot-hd', hasShots);
+        if (titleEl) {
+          const nm = stp.teststepName || 'Step';
+          if (hasShots) {
+            titleEl.className = 'test-step-title has-shot';
+            titleEl.setAttribute('role', 'button');
+            titleEl.setAttribute('tabindex', '0');
+            titleEl.setAttribute('title', 'Click to show/hide screenshot');
+            titleEl.innerHTML =
+              '<span class="step-shot-icon" aria-hidden="true">&#128247;</span>' + escHtml(nm);
+          } else {
+            titleEl.className = 'test-step-title';
+            titleEl.removeAttribute('role');
+            titleEl.removeAttribute('tabindex');
+            titleEl.removeAttribute('title');
+            titleEl.textContent = nm;
+          }
+        }
+        const typePill = el.querySelector('.step-type-pill');
+        if (typePill) typePill.textContent = typeLbl;
+        const statusEl = el.querySelector('.test-step-hd .sidebar-status-tag');
+        if (statusEl) {
+          statusEl.className = 'sidebar-status-tag ' + stTag.cls;
+          statusEl.textContent = stTag.txt;
+        }
+        let errEl = el.querySelector('.test-step-error');
+        if (stp.errorMessage) {
+          if (!errEl) {
+            errEl = document.createElement('div');
+            errEl.className = 'error test-step-error';
+            el.querySelector('.test-step-hd')?.after(errEl);
+          }
+          errEl.innerHTML = richTextHtml(formatErrorTextForDisplay(stp.errorMessage));
+          setElHidden(errEl, false);
+        } else if (errEl) setElHidden(errEl, true);
+        let metaEl = el.querySelector('.step-meta-wrap');
+        const metaHtml = stepMetaHtml(stp);
+        if (metaHtml) {
+          if (!metaEl) {
+            metaEl = document.createElement('div');
+            metaEl.className = 'step-meta-wrap';
+            el.appendChild(metaEl);
+          }
+          if (metaEl.innerHTML !== metaHtml) metaEl.innerHTML = metaHtml;
+          setElHidden(metaEl, false);
+        } else if (metaEl) setElHidden(metaEl, true);
+        let filesWrap = el.querySelector('.step-attached-files-wrap');
+        const filesHtml =
+          typeof window.renderAttachedFiles === 'function' ? window.renderAttachedFiles(stp) : '';
+        if (filesHtml) {
+          if (!filesWrap) {
+            filesWrap = document.createElement('div');
+            filesWrap.className = 'step-attached-files-wrap';
+            const anchor = el.querySelector('.step-meta-wrap') || el.querySelector('.test-step-hd');
+            if (anchor) anchor.after(filesWrap);
+            else el.appendChild(filesWrap);
+          }
+          if (filesWrap.innerHTML !== filesHtml) filesWrap.innerHTML = filesHtml;
+          setElHidden(filesWrap, false);
+        } else if (filesWrap) {
+          filesWrap.remove();
+        }
+        let logsWrap = el.querySelector('.step-logs-wrap');
+        const logsHtml = logsSectionHtml(stp.logs, 'Execution Logs');
+        if (logsHtml) {
+          if (!logsWrap) {
+            logsWrap = document.createElement('div');
+            logsWrap.className = 'step-logs-wrap';
+            const anchor =
+              el.querySelector('.step-attached-files-wrap') ||
+              el.querySelector('.step-meta-wrap') ||
+              el.querySelector('.test-step-hd');
+            if (anchor) anchor.after(logsWrap);
+            else el.appendChild(logsWrap);
+          }
+          if (logsWrap.innerHTML !== logsHtml) logsWrap.innerHTML = logsHtml;
+          setElHidden(logsWrap, false);
+        } else if (logsWrap) {
+          logsWrap.remove();
+        }
+        let shotsWrap = el.querySelector('.step-screenshots');
+        if (hasShots) {
+          const shotsHtml = shots.map(mediaHtmlForStepPath).join('');
+          if (!shotsWrap) {
+            shotsWrap = document.createElement('div');
+            shotsWrap.className = 'step-screenshots';
+            el.appendChild(shotsWrap);
+          }
+          if (shotsWrap.innerHTML !== shotsHtml) shotsWrap.innerHTML = shotsHtml;
+          const stepIdx = el.getAttribute('data-step-idx');
+          const shotKey = stepShotKey(selectedId, stepIdx);
+          const wantOpen = !!openStepShots[shotKey];
+          shotsWrap.classList.toggle('open', wantOpen);
+          if (titleEl) titleEl.classList.toggle('shots-open', wantOpen);
+        } else if (shotsWrap) {
+          shotsWrap.remove();
+        }
+      }
+
+      function createStepElement(stp, idx) {
+        const el = document.createElement('div');
+        el.className = 'test-step ' + statusClass(stp.status);
+        el.setAttribute('data-step-idx', String(idx));
+        el.innerHTML =
+          '<div class="test-step-hd"><p class="test-step-title"></p><div class="test-step-badges"><span class="step-type-pill" title="Step type"></span><span class="sidebar-status-tag" title="Step status"></span></div></div>';
+        patchStepElement(el, stp);
+        return el;
+      }
+
+      function syncStepsList(listEl, steps) {
+        if (!listEl) return;
+        const byIdx = new Map();
+        listEl.querySelectorAll('.test-step[data-step-idx]').forEach((el) => {
+          byIdx.set(el.getAttribute('data-step-idx'), el);
+        });
+        (steps || []).forEach((stp, i) => {
+          const idx = String(i);
+          let el = byIdx.get(idx);
+          if (!el) {
+            el = createStepElement(stp, i);
+            byIdx.set(idx, el);
+          } else {
+            patchStepElement(el, stp);
+          }
+          listEl.appendChild(el);
+        });
+      }
+
+      function patchCasePanel(root, t) {
+        const cls = statusClass(t.status);
+        const statusText = String(t.status || 'IN_PROGRESS').replace(/_/g, ' ');
+        const st = parseTs(t.startTime);
+        const et = parseTs(t.endTime);
+        const dur = st && et && et.getTime() >= st.getTime() ? fmtDurMs(et.getTime() - st.getTime()) : '—';
+        const machine = t.executionMachine || 'N/A';
+        root.className = 'test-case ' + cls;
+        root.setAttribute('data-testcase-key', testcaseKey(t));
+        root.querySelector('.testcase-title').textContent = t.testcaseName || 'N/A';
+        const chip = root.querySelector('.testcase-status-chip');
+        chip.className = 'testcase-status-chip ' + cls;
+        chip.textContent = statusText;
+        const descEl = root.querySelector('.testcase-desc');
+        if (t.description) {
+          descEl.textContent = String(t.description);
+          setElHidden(descEl, false);
+        } else setElHidden(descEl, true);
+        root.querySelector('.merv-meta-status').textContent = statusText;
+        root.querySelector('.merv-meta-dur').textContent = dur;
+        root.querySelector('.merv-meta-machine').textContent = machine;
+        const tagsLabel = root.querySelector('.testcase-tags-label');
+        const tagsEl = root.querySelector('.merv-case-tags');
+        const caseTags = Array.isArray(t.tags) ? t.tags.filter(Boolean) : [];
+        if (caseTags.length && tagsEl) {
+          tagsEl.innerHTML = caseTags
+            .map((tag) => '<span class="testcase-tag">' + escHtml(String(tag)) + '</span>')
+            .join('');
+          setElHidden(tagsLabel, false);
+          setElHidden(tagsEl.parentElement, false);
+          if (typeof mervRefreshTagCollapse === 'function') {
+            const shell = tagsEl.closest('.merv-tags-shell');
+            if (shell) mervRefreshTagCollapse(shell);
+          }
+        } else {
+          if (tagsEl) tagsEl.innerHTML = '';
+          setElHidden(tagsLabel, true);
+          if (tagsEl && tagsEl.parentElement) setElHidden(tagsEl.parentElement, true);
+        }
+        const failEl = root.querySelector('.merv-case-failure');
+        if (String(t.status || '').toUpperCase() === 'FAILED') {
+          failEl.className = 'error merv-case-failure';
+          failEl.innerHTML =
+            '<strong>Error:</strong><pre class="merv-case-failure-pre">' +
+            escHtml(testcaseFailureDisplayText(t)) +
+            '</pre>';
+          setElHidden(failEl, false);
+        } else {
+          failEl.innerHTML = '';
+          setElHidden(failEl, true);
+        }
+        const steps = t.testSteps || [];
+        const stepsHeading = root.querySelector('.merv-steps-heading');
+        setElHidden(stepsHeading, !steps.length);
+        syncStepsList(root.querySelector('#merv-steps-list'), steps);
+        restoreOpenStepScreenshots();
+        const caseLogsBlock = root.querySelector('.merv-case-logs-block');
+        const caseLogsEl = root.querySelector('.merv-case-logs');
+        const caseLogs = Array.isArray(t.logs) ? t.logs.filter((x) => String(x || '').trim()) : [];
+        if (caseLogsBlock && caseLogsEl) {
+          if (caseLogs.length) {
+            const html = caseLogs
+              .map(
+                (line) =>
+                  '<div class="log-line ' +
+                  logLineClass(line) +
+                  '">' +
+                  escHtml(String(line)) +
+                  '</div>',
+              )
+              .join('');
+            if (caseLogsEl.innerHTML !== html) caseLogsEl.innerHTML = html;
+            caseLogsBlock.style.display = '';
+          } else {
+            caseLogsEl.innerHTML = '';
+            caseLogsBlock.style.display = 'none';
+          }
+        }
+        const videosWrap = root.querySelector('.merv-case-videos');
+        const caseVideos = Array.isArray(t.videos) ? t.videos.filter(Boolean) : [];
+        if (videosWrap) {
+          const videosSig = caseVideos.map((v) => screenshotSrcForHtml(v)).join('\n');
+          if (caseVideos.length) {
+            if (videosWrap.getAttribute('data-videos-sig') !== videosSig) {
+              videosWrap.setAttribute('data-videos-sig', videosSig);
+              videosWrap.innerHTML =
+                '<h4 class="merv-case-videos-heading">Video</h4>' +
+                caseVideos
+                  .map((v) => {
+                    const src = screenshotSrcForHtml(v);
+                    return (
+                      '<div class="merv-case-video"><video controls preload="metadata" src="' +
+                      escHtml(src) +
+                      '"></video></div>'
+                    );
+                  })
+                  .join('');
+            }
+            videosWrap.removeAttribute('hidden');
+            setElHidden(videosWrap, false);
+          } else {
+            if (videosWrap.getAttribute('data-videos-sig') !== '') {
+              videosWrap.setAttribute('data-videos-sig', '');
+              videosWrap.innerHTML = '';
+            }
+            setElHidden(videosWrap, true);
+          }
+        }
+      }
+
+      function syncSelectedCasePanel(testCases) {
+        const out = document.getElementById('testcase-content');
+        if (!out) return;
+        if (!testCases || !testCases.length) {
+          if (!out.querySelector('#merv-live-case-root')) {
+            out.innerHTML = '<p class="merv-live-empty">No runtime data yet.</p>';
+          }
+          return;
+        }
+        const empty = out.querySelector('.merv-live-empty');
+        if (empty) empty.remove();
+        const { t } = resolveSelectedTestcase(testCases);
+        if (!t) {
+          if (out.querySelector('#merv-live-case-root')) return;
+          out.innerHTML = '<p class="merv-live-empty">No runtime data yet.</p>';
+          return;
+        }
+        const key = testcaseKey(t);
+        const panelScroll = out.scrollTop;
+        let root = out.querySelector('#merv-live-case-root');
+        const sameCase = !!(root && root.getAttribute('data-testcase-key') === key);
+        const sig = testcasePanelSignature(t);
+        if (sameCase && sig === lastPatchedCaseSig) {
+          // Open case unchanged — keep video / streaming / scroll position intact.
+          return;
+        }
+        if (!root || !sameCase) {
+          root = buildCasePanelShell();
+          out.innerHTML = '';
+          out.appendChild(root);
+          lastPatchedCaseSig = '';
+        }
+        patchCasePanel(root, t);
+        lastPatchedCaseSig = sig;
+        out.scrollTop = panelScroll;
+      }
+
+      function render(doc) {
+        latestData = doc || {};
+        const suite = (doc && doc.testSuite) || null;
+        if (!suite) return;
+
+        const tc = suite.testCases || [];
+        let p = 0,
+          f = 0,
+          k = 0;
+        tc.forEach((t) => {
+          const st = String(t.status || '').toUpperCase();
+          if (st === 'PASSED') p++;
+          else if (st === 'FAILED') f++;
+          else if (st === 'SKIPPED') k++;
+        });
+
+        const abortedStale = isStaleAborted(doc);
+        const stLbl = abortedStale ? 'ABORTED' : doc.running ? 'RUNNING' : 'COMPLETED';
+
+        const titleRoot = document.getElementById('suite-title');
+        if (titleRoot) {
+          let titleText = titleRoot.querySelector('.merv-suite-title-text');
+          if (!titleText) {
+            titleRoot.textContent = '';
+            titleText = document.createElement('span');
+            titleText.className = 'merv-suite-title-text';
+            titleRoot.appendChild(titleText);
+            const pill = document.createElement('span');
+            pill.id = 'run-state';
+            pill.className = 'status-pill';
+            titleRoot.appendChild(document.createTextNode(' '));
+            titleRoot.appendChild(pill);
+          }
+          titleText.textContent = suite.title || 'Merv Live Runtime Report';
+          const runState = document.getElementById('run-state');
+          if (runState) {
+            runState.className = 'status-pill' + (abortedStale ? ' aborted' : '');
+            runState.textContent = stLbl;
+          }
+        }
+        document.getElementById('live-banner').textContent = doc.running
+          ? `Live · Last update: ${new Date().toLocaleString()} | Test cases: ${tc.length}`
+          : `Execution completed. Test cases: ${tc.length}`;
+        const folderEl = document.getElementById('report-folder');
+        if (folderEl) {
+          let strong = folderEl.querySelector('strong');
+          let val = folderEl.querySelector('.merv-folder-val');
+          if (!strong) {
+            folderEl.textContent = '';
+            strong = document.createElement('strong');
+            strong.textContent = 'Folder name:';
+            val = document.createElement('span');
+            val.className = 'merv-folder-val';
+            folderEl.appendChild(strong);
+            folderEl.appendChild(document.createTextNode(' '));
+            folderEl.appendChild(val);
+          }
+          if (val) val.textContent = detectReportFolderName();
+        }
+
+        document.getElementById('total-count').textContent = String(tc.length);
+        document.getElementById('passed-count').textContent = String(p);
+        document.getElementById('failed-count').textContent = String(f);
+        document.getElementById('skipped-count').textContent = String(k);
+        document.getElementById('leg-p').textContent = `Passed (${p})`;
+        document.getElementById('leg-f').textContent = `Failed (${f})`;
+        document.getElementById('leg-k').textContent = `Skipped (${k})`;
+        drawPieChart(p, f, k);
+        maybeRenderFailureReasons(tc);
+        updateFailureJsonLink(f, doc.running === true);
+
+        syncSelectedCasePanel(tc);
+        syncSidebar(tc);
+        renderSuiteTagCloud();
+
+        const effectiveRun = doc.running === true && !abortedStale;
+        if (!effectiveRun) stopPolling();
+      }
+
+      async function load() {
+        const ts = `?ts=${Date.now()}`;
+        const paths = [`../json/merv-report.json${ts}`, `../../json/merv-report.json${ts}`];
+        for (const p of paths) {
+          try {
+            const r = await fetch(p, { cache: 'no-store' });
+            if (!r.ok) continue;
+            const d = await r.json();
+            render(d);
+            return;
+          } catch {}
+        }
+        if (window.__MERV_INLINE_REPORT__ && !latestData) {
+          render(window.__MERV_INLINE_REPORT__);
+        }
+      }
+
+      function initLiveSidebarDelegation() {
+        const root = document.getElementById('sidebar-list');
+        if (!root || root.getAttribute('data-merv-delegation') === '1') return;
+        root.setAttribute('data-merv-delegation', '1');
+        root.addEventListener('click', (ev) => {
+          const it = ev.target.closest('.sidebar-item[data-testcase-key]');
+          if (!it) return;
+          const tcIdx = parseInt(it.getAttribute('data-tc-idx') || '', 10);
+          saveSelectedTestcase(
+            it.getAttribute('data-testcase-key') || '',
+            isNaN(tcIdx) ? undefined : tcIdx,
+          );
+          const tc = (latestData && latestData.testSuite && latestData.testSuite.testCases) || [];
+          syncSelectedCasePanel(tc);
+          syncSidebar(tc);
+          document.getElementById('testcase-content')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      }
+      initLiveSidebarDelegation();
+      initStepScreenshotClicks();
+
+      // Embedded snapshot works when opened as file:// (fetch to ../json often blocked).
+      if (window.__MERV_INLINE_REPORT__ && !latestData) {
+        render(window.__MERV_INLINE_REPORT__);
+      }
+
+      const shouldPollLiveJson =
+        !latestData || (latestData.running === true && !isStaleAborted(latestData));
+      if (shouldPollLiveJson) {
+        startPollingIfNeeded();
+        load();
+      }
+
+      // screenshots toggle — when checked, show all step screenshots; when off, only steps toggled open
+      (function () {
+        const cb = document.getElementById('toggle-shots');
+        if (!cb) return;
+        const key = 'merv.showScreenshots';
+        const apply = (v) => document.body.classList.toggle('hide-shots', !v);
+        const saved = (() => {
+          try {
+            return localStorage.getItem(key);
+          } catch {
+            return null;
+          }
+        })();
+        if (saved === '0') cb.checked = false;
+        apply(cb.checked);
+        cb.addEventListener('change', () => {
+          apply(cb.checked);
+          try {
+            localStorage.setItem(key, cb.checked ? '1' : '0');
+          } catch {}
+        });
+      })();
+
+      // Share / Download / Local Dashboard only work with merv show-report. Hide for file:// offline opens.
+      (function hideOfflineShareDownload() {
+        if (location.protocol !== 'file:') return;
+        const actions = document.getElementById('suite-heading-actions');
+        if (actions) actions.hidden = true;
+        const share = document.getElementById('share-report-btn');
+        const dl = document.getElementById('download-report-btn');
+        if (share) share.hidden = true;
+        if (dl) dl.hidden = true;
+        document.querySelectorAll('a.local-dash, a.sidebar-local-label').forEach(function (el) {
+          if (el.classList.contains('sidebar-local-label')) {
+            const span = document.createElement('span');
+            span.className = 'sidebar-local-label';
+            span.textContent = 'Merv';
+            el.replaceWith(span);
+          } else {
+            el.remove();
+          }
+        });
+      })();
+
+      // Share report link (LAN URL when served by merv show-report)
+      (function initShareReport() {
+        const modal = document.getElementById('merv-share-modal');
+        const btn = document.getElementById('share-report-btn');
+        const closeBtn = document.getElementById('merv-share-close');
+        const backdrop = document.getElementById('merv-share-backdrop');
+        const linkInput = document.getElementById('merv-share-link');
+        const copyBtn = document.getElementById('merv-share-copy');
+        const statusEl = document.getElementById('merv-share-status');
+        const warnEl = document.getElementById('merv-share-warn');
+        if (!modal || !btn || !linkInput) return;
+
+        function setStatus(text) {
+          if (statusEl) statusEl.textContent = text || '';
+        }
+
+        function setWarn(html) {
+          if (!warnEl) return;
+          if (!html) {
+            warnEl.hidden = true;
+            warnEl.innerHTML = '';
+            return;
+          }
+          warnEl.hidden = false;
+          warnEl.innerHTML = html;
+        }
+
+        function buildShareUrl(info) {
+          const loc = window.location;
+          if (loc.protocol === 'file:') {
+            return loc.href;
+          }
+          const path = loc.pathname + loc.search + loc.hash;
+          const host =
+            (info && info.suggestedHost) ||
+            (info && info.lanAddresses && info.lanAddresses[0]) ||
+            loc.hostname;
+          const port = (info && info.port) || loc.port || '6174';
+          const portPart =
+            (port === '80' && loc.protocol === 'http:') || (port === '443' && loc.protocol === 'https:')
+              ? ''
+              : ':' + port;
+          return loc.protocol + '//' + host + portPart + path;
+        }
+
+        async function loadShareInfo() {
+          try {
+            const res = await fetch('/api/share-info', { cache: 'no-store' });
+            if (!res.ok) return null;
+            return await res.json();
+          } catch {
+            return null;
+          }
+        }
+
+        async function openModal() {
+          setStatus('');
+          const loc = window.location;
+          if (loc.protocol === 'file:') {
+            linkInput.value = loc.href;
+            setWarn(
+              'This page was opened as a local file. Start the report server so others can open it: <code>npx merv show-report --host 0.0.0.0</code>',
+            );
+          } else {
+            const info = await loadShareInfo();
+            linkInput.value = buildShareUrl(info);
+            if (info && (info.localOnly || info.lanReachable === false)) {
+              setWarn(
+                'This server is bound to <code>' +
+                  escHtml(String(info.bindHost || '127.0.0.1')) +
+                  '</code> (local only). Restart with <code>npx merv show-report --host 0.0.0.0 --port ' +
+                  escHtml(String(info.port || '6174')) +
+                  '</code> so people on your network can open the share link.',
+              );
+            } else if (!info) {
+              setWarn(
+                'Could not load LAN share details. If others cannot open this link, restart with <code>npx merv show-report --host 0.0.0.0</code>.',
+              );
+            } else {
+              setWarn('');
+            }
+          }
+          modal.classList.add('open');
+          modal.setAttribute('aria-hidden', 'false');
+          linkInput.focus();
+          linkInput.select();
+        }
+
+        function closeModal() {
+          modal.classList.remove('open');
+          modal.setAttribute('aria-hidden', 'true');
+          setStatus('');
+        }
+
+        async function copyLink() {
+          const text = linkInput.value;
+          try {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              await navigator.clipboard.writeText(text);
+            } else {
+              linkInput.select();
+              document.execCommand('copy');
+            }
+            setStatus('Link copied');
+          } catch {
+            linkInput.select();
+            setStatus('Press Ctrl/Cmd+C to copy');
+          }
+        }
+
+        btn.addEventListener('click', function () {
+          void openModal();
+        });
+        if (closeBtn) closeBtn.addEventListener('click', closeModal);
+        if (backdrop) backdrop.addEventListener('click', closeModal);
+        if (copyBtn) copyBtn.addEventListener('click', function () {
+          void copyLink();
+        });
+        document.addEventListener('keydown', function (ev) {
+          if (ev.key === 'Escape' && modal.classList.contains('open')) closeModal();
+        });
+      })();
+
+      // Download emailable + offline zip (via merv show-report)
+      (function initDownloadReport() {
+        const btn = document.getElementById('download-report-btn');
+        const toast = document.getElementById('merv-download-toast');
+        const toastSize = document.getElementById('merv-download-toast-size');
+        const toastDetail = document.getElementById('merv-download-toast-detail');
+        const toastOk = document.getElementById('merv-download-toast-ok');
+        const toastBackdrop = document.getElementById('merv-download-toast-backdrop');
+        if (!btn) return;
+
+        function closeToast() {
+          if (!toast) return;
+          toast.classList.remove('open');
+          toast.setAttribute('aria-hidden', 'true');
+        }
+
+        function openToast(sizeLabel, detail) {
+          if (toastSize) toastSize.textContent = sizeLabel || '—';
+          if (toastDetail && detail) toastDetail.textContent = detail;
+          if (!toast) return;
+          toast.classList.add('open');
+          toast.setAttribute('aria-hidden', 'false');
+        }
+
+        async function downloadBlob(url, filename) {
+          const res = await fetch(url, { cache: 'no-store' });
+          if (!res.ok) throw new Error('Download failed (' + res.status + ')');
+          const blob = await res.blob();
+          const a = document.createElement('a');
+          const obj = URL.createObjectURL(blob);
+          a.href = obj;
+          a.download = filename || 'download';
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          setTimeout(function () {
+            URL.revokeObjectURL(obj);
+          }, 1500);
+        }
+
+        async function onDownload() {
+          if (location.protocol === 'file:') {
+            openToast(
+              '—',
+              'Open this report with npx merv show-report to download the emailable HTML and offline zip.',
+            );
+            return;
+          }
+          const folder = detectReportFolderName();
+          if (!folder || folder === '—' || folder === '-') {
+            openToast('—', 'Could not detect the report folder name.');
+            return;
+          }
+          const prev = btn.textContent;
+          btn.disabled = true;
+          btn.textContent = 'Preparing…';
+          try {
+            const res = await fetch(
+              '/api/prepare-download?folder=' + encodeURIComponent(folder),
+              { cache: 'no-store' },
+            );
+            const info = await res.json();
+            if (!res.ok || !info || !info.ok) {
+              throw new Error((info && info.error) || 'Prepare download failed');
+            }
+            await downloadBlob(info.emailableUrl, info.emailableFileName || 'emailable-report.html');
+            await downloadBlob(info.zipUrl, info.zipFileName || 'merv-report-offline.zip');
+            openToast(
+              info.zipSizeLabel || formatFallbackSize(info.zipBytes),
+              'Emailable report (' +
+                (info.emailableSizeLabel || '—') +
+                ') and offline zip (with index.html) were downloaded.',
+            );
+          } catch (e) {
+            openToast(
+              '—',
+              'Download failed: ' + (e && e.message ? e.message : String(e)) +
+                '. Start the report with npx merv show-report.',
+            );
+          } finally {
+            btn.disabled = false;
+            btn.textContent = prev || 'Download';
+          }
+        }
+
+        function formatFallbackSize(bytes) {
+          const n = Number(bytes);
+          if (!Number.isFinite(n) || n < 0) return '—';
+          if (n < 1024) return n + ' B';
+          if (n < 1024 * 1024) return (n / 1024).toFixed(1) + ' KB';
+          return (n / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        btn.addEventListener('click', function () {
+          void onDownload();
+        });
+        if (toastOk) toastOk.addEventListener('click', closeToast);
+        if (toastBackdrop) toastBackdrop.addEventListener('click', closeToast);
+        document.addEventListener('keydown', function (ev) {
+          if (ev.key === 'Escape' && toast && toast.classList.contains('open')) closeToast();
+        });
+      })();
+
+      /**
+ * Collapse tag lists to N rows with a more/less toggle.
+ * Markup: .merv-tags-shell[data-merv-tag-rows="1|3"] wrapping the flex tag container.
+ */
+(function (global) {
+  'use strict';
+
+  var DEFAULT_ROW_PX = 22;
+  var DEFAULT_GAP_PX = 6;
+
+  function rowsToMaxHeight(rows, rowPx, gapPx) {
+    var r = Math.max(1, rows | 0);
+    return r * rowPx + Math.max(0, r - 1) * gapPx;
+  }
+
+  function parseNum(attr, fallback) {
+    var n = parseInt(attr || '', 10);
+    return isNaN(n) || n < 1 ? fallback : n;
+  }
+
+  function tagFlexChild(shell) {
+    return (
+      shell.querySelector('.tag-row') ||
+      shell.querySelector('.suite-adv-tag-cloud') ||
+      shell.querySelector('.testcase-tags') ||
+      shell.querySelector('.sidebar-item-tags') ||
+      shell.firstElementChild
+    );
+  }
+
+  function collapseMaxHeight(shell) {
+    var rows = parseNum(shell.getAttribute('data-merv-tag-rows'), 1);
+    var rowPx = parseNum(shell.getAttribute('data-merv-tag-row-px'), DEFAULT_ROW_PX);
+    var gapPx = parseNum(shell.getAttribute('data-merv-tag-gap-px'), DEFAULT_GAP_PX);
+    var child = tagFlexChild(shell);
+    if (child && global.getComputedStyle) {
+      try {
+        var cs = global.getComputedStyle(child);
+        var g = parseInt(cs.rowGap || cs.gap || '', 10);
+        if (!isNaN(g)) gapPx = g;
+      } catch (ex) {}
+    }
+    return rowsToMaxHeight(rows, rowPx, gapPx);
+  }
+
+  function ensureMoreBtn(shell) {
+    var next = shell.nextElementSibling;
+    if (next && next.classList && next.classList.contains('merv-tags-more')) return next;
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'merv-tags-more';
+    btn.textContent = 'more';
+    btn.addEventListener('click', function () {
+      var expanded = shell.classList.toggle('merv-tags-expanded');
+      shell.classList.toggle('merv-tags-collapsed', !expanded);
+      if (expanded) {
+        shell.style.maxHeight = 'none';
+        btn.textContent = 'less';
+      } else {
+        shell.style.maxHeight = collapseMaxHeight(shell) + 'px';
+        btn.textContent = 'more';
+        refreshShell(shell);
+      }
+    });
+    shell.parentNode.insertBefore(btn, shell.nextSibling);
+    return btn;
+  }
+
+  function refreshShell(shell) {
+    if (!shell || !shell.classList || !shell.classList.contains('merv-tags-shell')) return;
+    var btn = ensureMoreBtn(shell);
+    if (shell.classList.contains('merv-tags-expanded')) {
+      shell.style.maxHeight = 'none';
+      if (btn) {
+        btn.textContent = 'less';
+        btn.hidden = false;
+      }
+      return;
+    }
+    shell.classList.add('merv-tags-collapsed');
+    var maxH = collapseMaxHeight(shell);
+    shell.style.maxHeight = maxH + 'px';
+    var overflow = shell.scrollHeight > shell.clientHeight + 2;
+    if (btn) {
+      btn.hidden = !overflow;
+      btn.textContent = 'more';
+    }
+    if (!overflow) {
+      shell.classList.remove('merv-tags-collapsed');
+      shell.style.maxHeight = '';
+      if (btn) btn.hidden = true;
+    }
+  }
+
+  function refreshTagCollapse(root) {
+    if (!root || !root.querySelectorAll) {
+      root = document;
+    }
+    if (root.classList && root.classList.contains('merv-tags-shell')) {
+      refreshShell(root);
+      return;
+    }
+    var shells = root.querySelectorAll('.merv-tags-shell');
+    for (var i = 0; i < shells.length; i++) refreshShell(shells[i]);
+  }
+
+  global.mervRefreshTagCollapse = refreshTagCollapse;
+
+  function onReady() {
+    refreshTagCollapse(document);
+  }
+
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', onReady);
+    } else {
+      onReady();
+    }
+  }
+})(typeof window !== 'undefined' ? window : globalThis);
+
+
+      /* Shared testdata file attachment UI (Java MervTestDataFileHtml parity). Requires escHtml() in page scope. */
+(function () {
+  var PREVIEW_LINE_COUNT = 10;
+  var OPEN_IN_TAB_LINE_THRESHOLD = 50;
+
+  function fmtFileSize(n) {
+    n = +n || 0;
+    if (n < 1024) return n + ' B';
+    if (n < 1048576) return (n / 1024).toFixed(2) + ' KB';
+    return (n / 1048576).toFixed(2) + ' MB';
+  }
+
+  function isFlatExt(ext) {
+    ext = String(ext || '').toLowerCase();
+    if (!ext) return false;
+    return ext === 'txt' || ext === 'json' || ext === 'csv' || ext === 'java';
+  }
+
+  function isImageExt(ext) {
+    ext = String(ext || '').toLowerCase();
+    if (!ext) return false;
+    return (
+      ext === 'png' ||
+      ext === 'jpg' ||
+      ext === 'jpeg' ||
+      ext === 'gif' ||
+      ext === 'bmp' ||
+      ext === 'webp' ||
+      ext === 'svg' ||
+      ext === 'ico'
+    );
+  }
+
+  function fileUrl(rel) {
+    return ('../' + String(rel || '')).replace(/\\/g, '/');
+  }
+
+  function splitLines(t) {
+    return String(t || '')
+      .replace(/\r\n/g, '\n')
+      .replace(/\r/g, '\n')
+      .split('\n');
+  }
+
+  function renderOversizeFileBar(af) {
+    var name = af.originalName || 'file';
+    var ext = String(af.fileExtension || '').toUpperCase() || 'FILE';
+    var size = fmtFileSize(af.fileSize);
+    var h = '<div class="testdata-file-bar">';
+    h += '<div class="testdata-file-bar-icon">&#128196;</div>';
+    h +=
+      '<div class="testdata-file-bar-info"><div class="testdata-file-bar-title"><span class="testdata-file-bar-name" title="' +
+      escHtml(name) +
+      '">' +
+      escHtml(name) +
+      '</span><span class="testdata-file-bar-badge">' +
+      escHtml(ext) +
+      '</span></div>';
+    if (size) h += '<div class="testdata-file-bar-size">' + escHtml(size) + '</div>';
+    h +=
+      '<div class="testdata-file-bar-oversize">Download not available due to size exceed 20MB</div>';
+    h += '</div></div>';
+    return h;
+  }
+
+  function renderBinaryFileBar(af, url) {
+    var name = af.originalName || 'file';
+    var ext = String(af.fileExtension || '').toUpperCase() || 'FILE';
+    var size = fmtFileSize(af.fileSize);
+    var h = '<div class="testdata-file-bar">';
+    h += '<div class="testdata-file-bar-icon">&#128196;</div>';
+    h +=
+      '<div class="testdata-file-bar-info"><div class="testdata-file-bar-title"><span class="testdata-file-bar-name" title="' +
+      escHtml(name) +
+      '">' +
+      escHtml(name) +
+      '</span><span class="testdata-file-bar-badge">' +
+      escHtml(ext) +
+      '</span></div>';
+    if (size) h += '<div class="testdata-file-bar-size">' + escHtml(size) + '</div>';
+    h += '</div><div class="testdata-file-bar-actions">';
+    h +=
+      '<button type="button" class="testdata-file-bar-btn" data-dl="' +
+      escHtml(url) +
+      '" data-name="' +
+      escHtml(name) +
+      '" title="Download">&#8681;</button>';
+    h +=
+      '<button type="button" class="testdata-file-bar-btn" data-open="' +
+      escHtml(url) +
+      '" title="Open in new tab">&#8599;</button>';
+    h += '</div></div>';
+    return h;
+  }
+
+  function renderImageFileBlock(af, url) {
+    var name = af.originalName || 'file';
+    return (
+      '<div class="testdata-image-file"><img class="testdata-image-file-preview merv-zoomable-image" src="' +
+      escHtml(url) +
+      '" alt="' +
+      escHtml(name) +
+      '" loading="lazy" data-img-url="' +
+      escHtml(url) +
+      '" data-img-name="' +
+      escHtml(name) +
+      '" title="Click to zoom"/></div>'
+    );
+  }
+
+  var _imgLbZoom = 1,
+    _imgLbPanX = 0,
+    _imgLbPanY = 0,
+    _imgLbDrag = null;
+
+  function applyImageLightboxTransform() {
+    var img = document.querySelector('#merv-image-lightbox .merv-image-lightbox-img');
+    if (img) img.style.transform = 'translate(' + _imgLbPanX + 'px,' + _imgLbPanY + 'px) scale(' + _imgLbZoom + ')';
+  }
+
+  function setImageLightboxZoom(z) {
+    _imgLbZoom = Math.max(0.25, Math.min(4, z));
+    applyImageLightboxTransform();
+    var lbl = document.querySelector('#merv-image-lightbox .merv-image-lightbox-zoom-label');
+    if (lbl) lbl.textContent = Math.round(_imgLbZoom * 100) + '%';
+  }
+
+  function resetImageLightboxView() {
+    _imgLbZoom = 1;
+    _imgLbPanX = 0;
+    _imgLbPanY = 0;
+    applyImageLightboxTransform();
+    var lbl = document.querySelector('#merv-image-lightbox .merv-image-lightbox-zoom-label');
+    if (lbl) lbl.textContent = '100%';
+  }
+
+  function wireImageLightboxDrag(vp) {
+    if (vp._mervDragWired) return;
+    vp._mervDragWired = true;
+    vp.addEventListener('pointerdown', function (ev) {
+      if (ev.button !== 0) return;
+      _imgLbDrag = { sx: ev.clientX, sy: ev.clientY, px: _imgLbPanX, py: _imgLbPanY };
+      vp.setPointerCapture(ev.pointerId);
+      vp.classList.add('dragging');
+      var img = vp.querySelector('.merv-image-lightbox-img');
+      if (img) img.style.transition = 'none';
+      ev.preventDefault();
+    });
+    vp.addEventListener('pointermove', function (ev) {
+      if (!_imgLbDrag) return;
+      _imgLbPanX = _imgLbDrag.px + (ev.clientX - _imgLbDrag.sx);
+      _imgLbPanY = _imgLbDrag.py + (ev.clientY - _imgLbDrag.sy);
+      applyImageLightboxTransform();
+      ev.preventDefault();
+    });
+    var endLbDrag = function (ev) {
+      if (!_imgLbDrag) return;
+      _imgLbDrag = null;
+      vp.classList.remove('dragging');
+      var img = vp.querySelector('.merv-image-lightbox-img');
+      if (img) img.style.transition = '';
+      try {
+        vp.releasePointerCapture(ev.pointerId);
+      } catch (ex) {}
+    };
+    vp.addEventListener('pointerup', endLbDrag);
+    vp.addEventListener('pointercancel', endLbDrag);
+  }
+
+  function closeImageLightbox() {
+    var lb = document.getElementById('merv-image-lightbox');
+    if (lb) lb.classList.remove('open');
+  }
+
+  function ensureImageLightbox() {
+    var lb = document.getElementById('merv-image-lightbox');
+    if (lb) return lb;
+    lb = document.createElement('div');
+    lb.id = 'merv-image-lightbox';
+    lb.className = 'merv-image-lightbox';
+    lb.innerHTML =
+      '<div class="merv-image-lightbox-backdrop"></div><div class="merv-image-lightbox-panel"><div class="merv-image-lightbox-header"><span class="merv-image-lightbox-title"></span><button type="button" class="merv-image-lightbox-close" title="Close">&times;</button></div><div class="merv-image-lightbox-viewport"><img class="merv-image-lightbox-img" alt=""/></div><div class="merv-image-lightbox-toolbar"><button type="button" class="merv-image-lightbox-zoom-out" title="Zoom out">&#8722;</button><span class="merv-image-lightbox-zoom-label">100%</span><button type="button" class="merv-image-lightbox-zoom-in" title="Zoom in">+</button><button type="button" class="merv-image-lightbox-zoom-reset" title="Reset">Reset</button></div></div>';
+    document.body.appendChild(lb);
+    lb.querySelector('.merv-image-lightbox-backdrop').onclick = closeImageLightbox;
+    lb.querySelector('.merv-image-lightbox-close').onclick = closeImageLightbox;
+    lb.querySelector('.merv-image-lightbox-zoom-in').onclick = function () {
+      setImageLightboxZoom(_imgLbZoom + 0.25);
+    };
+    lb.querySelector('.merv-image-lightbox-zoom-out').onclick = function () {
+      setImageLightboxZoom(_imgLbZoom - 0.25);
+    };
+    lb.querySelector('.merv-image-lightbox-zoom-reset').onclick = resetImageLightboxView;
+    wireImageLightboxDrag(lb.querySelector('.merv-image-lightbox-viewport'));
+    return lb;
+  }
+
+  function openImageLightbox(url, name) {
+    var lb = ensureImageLightbox();
+    resetImageLightboxView();
+    lb.querySelector('.merv-image-lightbox-title').textContent = name || 'Image';
+    var img = lb.querySelector('.merv-image-lightbox-img');
+    img.src = url;
+    img.alt = name || 'Image';
+    lb.classList.add('open');
+  }
+
+  function renderFlatFileBlock(af, url) {
+    var id = 'flat-' + Math.random().toString(36).slice(2);
+    var ext = String(af.fileExtension || '').toUpperCase() || 'FILE';
+    var name = af.originalName || 'file';
+    var h =
+      '<div class="testdata-flat-file" id="' +
+      id +
+      '" data-url="' +
+      escHtml(url) +
+      '"><div class="testdata-flat-file-head"><span class="testdata-flat-file-name" title="' +
+      escHtml(name) +
+      '">' +
+      escHtml(name) +
+      '</span><span class="testdata-flat-file-badge">' +
+      escHtml(ext) +
+      '</span></div><pre class="testdata-flat-file-preview">Loading…</pre></div>';
+    fetch(url)
+      .then(function (r) {
+        return r.text();
+      })
+      .then(function (txt) {
+        var box = document.getElementById(id);
+        if (!box) return;
+        var pre = box.querySelector('.testdata-flat-file-preview');
+        if (!pre) return;
+        var lines = splitLines(txt);
+        var preview = lines.slice(0, PREVIEW_LINE_COUNT).join('\n');
+        pre.textContent = preview;
+        box._fullText = txt;
+        box._lineCount = lines.length;
+        if (lines.length > PREVIEW_LINE_COUNT || lines.length > OPEN_IN_TAB_LINE_THRESHOLD) {
+          var link = document.createElement('span');
+          link.className = 'testdata-flat-file-link';
+          link.textContent =
+            lines.length > OPEN_IN_TAB_LINE_THRESHOLD
+              ? 'Click to see full file (opens in new tab)'
+              : 'Click to see full file';
+          link.onclick = function (ev) {
+            ev.preventDefault();
+            if (box._lineCount > OPEN_IN_TAB_LINE_THRESHOLD) {
+              window.open(url, '_blank');
+              return;
+            }
+            pre.textContent = box._expanded ? preview : box._fullText;
+            link.textContent = box._expanded ? 'Click to see full file' : 'Show less';
+            box._expanded = !box._expanded;
+          };
+          box.appendChild(link);
+        }
+      })
+      .catch(function () {
+        var box = document.getElementById(id);
+        if (!box) return;
+        var pre = box.querySelector('.testdata-flat-file-preview');
+        if (pre) pre.textContent = 'Could not load file preview.';
+      });
+    return h;
+  }
+
+  window.renderAttachedFiles = function (st) {
+    var files = (st && st.attachedFiles) || [];
+    if (!files.length) return '';
+    var h = '<div class="testdata-files">';
+    files.forEach(function (af) {
+      if (!af) return;
+      if (af.sizeExceeded) {
+        h += renderOversizeFileBar(af);
+        return;
+      }
+      if (!af.path) return;
+      var url = fileUrl(af.path);
+      if (isImageExt(af.fileExtension)) h += renderImageFileBlock(af, url);
+      else if (isFlatExt(af.fileExtension)) h += renderFlatFileBlock(af, url);
+      else h += renderBinaryFileBar(af, url);
+    });
+    h += '</div>';
+    return h;
+  };
+
+  document.addEventListener('click', function (ev) {
+    var zi = ev.target && ev.target.closest ? ev.target.closest('.merv-zoomable-image') : null;
+    if (zi) {
+      ev.preventDefault();
+      openImageLightbox(zi.getAttribute('data-img-url') || zi.src, zi.getAttribute('data-img-name') || zi.alt);
+      return;
+    }
+    var dl = ev.target && ev.target.closest ? ev.target.closest('[data-dl]') : null;
+    if (dl) {
+      ev.preventDefault();
+      var u = dl.getAttribute('data-dl');
+      var n = dl.getAttribute('data-name') || 'file';
+      var a = document.createElement('a');
+      a.href = u;
+      a.download = n;
+      a.click();
+      return;
+    }
+    var op = ev.target && ev.target.closest ? ev.target.closest('[data-open]') : null;
+    if (op) {
+      ev.preventDefault();
+      window.open(op.getAttribute('data-open'), '_blank');
+    }
+  });
+
+  document.addEventListener('keydown', function (ev) {
+    if (ev.key === 'Escape') closeImageLightbox();
+  });
+})();
+
+
+      initSuiteFilters();
+    </script>
+  </body>
+</html>
+
