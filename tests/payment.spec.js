@@ -1,5 +1,8 @@
 import { test, expect } from '@playwright/test';
 
+// admin
+
+// load admin
 
 test('verify user able to login1 payment', async ({ page }) => {
   await page.goto('https://www.saucedemo.com/inventory.html');

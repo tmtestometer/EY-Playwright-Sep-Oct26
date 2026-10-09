@@ -1,0 +1,16 @@
+{"ts":"2026-10-09T08:25:05.406Z","level":"INFO","name":"Merv","msg":"Suite started — ey-sep29-batch-demo","suite":"ey-sep29-batch-demo"}
+{"ts":"2026-10-09T08:25:07.336Z","level":"INFO","name":"Merv","msg":"Before Hooks › Fixture \"browser\" › Launch browser","suite":"ey-sep29-batch-demo","testcase":"› chromium › mock.spec.js › credentialSetup @credentialSetup"}
+{"ts":"2026-10-09T08:25:09.781Z","level":"INFO","name":"Merv","msg":"Before Hooks › Fixture \"context\" › Create context","suite":"ey-sep29-batch-demo","testcase":"› chromium › mock.spec.js › credentialSetup @credentialSetup"}
+{"ts":"2026-10-09T08:25:10.550Z","level":"INFO","name":"Merv","msg":"Before Hooks › Fixture \"page\" › Create page","suite":"ey-sep29-batch-demo","testcase":"› chromium › mock.spec.js › credentialSetup @credentialSetup"}
+{"ts":"2026-10-09T08:25:12.295Z","level":"INFO","name":"Merv","msg":"Navigate","suite":"ey-sep29-batch-demo","testcase":"› chromium › mock.spec.js › credentialSetup @credentialSetup"}
+{"ts":"2026-10-09T08:25:17.300Z","level":"INFO","name":"Merv","msg":"Wait for timeout","suite":"ey-sep29-batch-demo","testcase":"› chromium › mock.spec.js › credentialSetup @credentialSetup"}
+{"ts":"2026-10-09T08:25:17.453Z","level":"INFO","name":"Merv","msg":"After Hooks › Fixture \"context\" › Close context","suite":"ey-sep29-batch-demo","testcase":"› chromium › mock.spec.js › credentialSetup @credentialSetup"}
+{"ts":"2026-10-09T08:25:17.512Z","level":"INFO","name":"Merv","msg":"Test finished —  › chromium › mock.spec.js › credentialSetup @credentialSetup (PASSED)","suite":"ey-sep29-batch-demo","testcase":"› chromium › mock.spec.js › credentialSetup @credentialSetup"}
+{"ts":"2026-10-09T08:26:39.717Z","level":"INFO","name":"Merv","msg":"Suite started — ey-sep29-batch-demo","suite":"ey-sep29-batch-demo"}
+{"ts":"2026-10-09T08:26:44.201Z","level":"INFO","name":"Merv","msg":"Before Hooks › Fixture \"browser\" › Launch browser","suite":"ey-sep29-batch-demo","testcase":"› chromium › mock.spec.js › credentialSetup @credentialSetup"}
+{"ts":"2026-10-09T08:26:46.473Z","level":"INFO","name":"Merv","msg":"Before Hooks › Fixture \"context\" › Create context","suite":"ey-sep29-batch-demo","testcase":"› chromium › mock.spec.js › credentialSetup @credentialSetup"}
+{"ts":"2026-10-09T08:26:47.623Z","level":"INFO","name":"Merv","msg":"Before Hooks › Fixture \"page\" › Create page","suite":"ey-sep29-batch-demo","testcase":"› chromium › mock.spec.js › credentialSetup @credentialSetup"}
+{"ts":"2026-10-09T08:26:49.458Z","level":"INFO","name":"Merv","msg":"Navigate","suite":"ey-sep29-batch-demo","testcase":"› chromium › mock.spec.js › credentialSetup @credentialSetup"}
+{"ts":"2026-10-09T08:26:54.909Z","level":"INFO","name":"Merv","msg":"Wait for timeout","suite":"ey-sep29-batch-demo","testcase":"› chromium › mock.spec.js › credentialSetup @credentialSetup"}
+{"ts":"2026-10-09T08:26:57.303Z","level":"INFO","name":"Merv","msg":"After Hooks › Fixture \"context\" › Close context","suite":"ey-sep29-batch-demo","testcase":"› chromium › mock.spec.js › credentialSetup @credentialSetup"}
+{"ts":"2026-10-09T08:26:57.545Z","level":"INFO","name":"Merv","msg":"Test finished —  › chromium › mock.spec.js › credentialSetup @credentialSetup (PASSED)","suite":"ey-sep29-batch-demo","testcase":"› chromium › mock.spec.js › credentialSetup @credentialSetup"}

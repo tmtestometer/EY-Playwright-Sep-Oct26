@@ -1,0 +1,45 @@
+{
+  "version": "1.0",
+  "running": false,
+  "lastActivityMillis": 1791534317688,
+  "exportDate": "Fri Oct 09 2026 13:55:17 GMT+0530 (India Standard Time)",
+  "testSuite": {
+    "title": "ey-sep29-batch-demo",
+    "startTime": "2026-10-09T08:25:05.381Z",
+    "endTime": "2026-10-09T08:25:17.688Z",
+    "testCases": [
+      {
+        "testcaseName": " › chromium › mock.spec.js › credentialSetup @credentialSetup",
+        "status": "PASSED",
+        "failureReason": null,
+        "tags": [
+          "chromium",
+          "@credentialSetup"
+        ],
+        "startTime": "2026-10-09T08:25:05.936Z",
+        "endTime": "2026-10-09T08:25:16.047Z",
+        "executionMachine": "Vaibhavs-Laptop.local",
+        "testSteps": [
+          {
+            "teststepName": "Navigate",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "PASSED",
+            "startTime": "2026-10-09T08:25:10.707Z",
+            "endTime": "2026-10-09T08:25:12.294Z",
+            "errorMessage": null,
+            "screenshots": []
+          },
+          {
+            "teststepName": "Wait for timeout",
+            "stepType": "PLAYWRIGHT_API",
+            "status": "PASSED",
+            "startTime": "2026-10-09T08:25:12.295Z",
+            "endTime": "2026-10-09T08:25:17.298Z",
+            "errorMessage": null,
+            "screenshots": []
+          }
+        ]
+      }
+    ]
+  }
+}
