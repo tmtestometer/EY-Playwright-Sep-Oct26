@@ -24,7 +24,34 @@ EmpID, EmpName, EmpDepartment
 
 
 
-non-relation database - mongodb, cassendra, 
+## Docker MySQL + phpMyAdmin
+
+```bash
+docker compose up -d
+```
+
+| App | URL / host | Login |
+|-----|------------|--------|
+| MySQL | `127.0.0.1:3306` | user `eyuser` / password `eypass` / db `eyplaywright` |
+| phpMyAdmin | http://localhost:8080 | same user/password |
+
+Root MySQL password is `root`.
+
+Playwright helper: `tests/db.connection.js`
+
+```js
+import { getDbConnection, query } from './db.connection.js';
+
+const employees = await query('SELECT * FROM Emp');
+```
+
+Stop:
+
+```bash
+docker compose down
+```
+
+non-relation database - mongodb, cassendra,  
 
 {
     "name" : "vaibhav"

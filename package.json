@@ -12,10 +12,14 @@
     "qa:sanity": "npx cucumber-js --tags '@smoke'",
     "qa:full": "npx cucumber-js --tags '@smoke and @sanity'",
     "typecheck": "npx tsc typescript/calculator.ts --ignoreConfig",
-    "runcheck": "npx tsx typescript/calculator.ts --ignoreConfig"
+    "runcheck": "npx tsx typescript/calculator.ts --ignoreConfig",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "db:test": "npx playwright test tests/db.spec.js"
   },
   "dependencies": {
     "@cucumber/cucumber": "^13.3.0",
+    "mysql2": "^3.24.5",
     "playwright": "^1.63.0",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2"
